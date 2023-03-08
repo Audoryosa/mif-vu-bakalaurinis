@@ -22,14 +22,14 @@
 % Naujos Palemono versijos talpinamos
 % https://vlkk.lt/palemonas
 \setmainfont[
-    Path=fonts/Palemonas3.2.05/,
     Ligatures=TeX,
-    Extension=.ttf,
-    UprightFont=*-nm,
-    BoldFont=*-bd,
-    ItalicFont=*-it,
-    BoldItalicFont=*-bi,
-]{Palem3.2.05}
+    Extension=.otf,
+    UprightFont= *-regular,
+    BoldFont=*-bold,
+    ItalicFont=*-italic,
+    BoldItalicFont=*-bolditalic
+]{texgyretermes}  % Teksto  šriftas bus Nimbus Roman No9 L, kuris yra
+                  % atviras Times New Roman šrifto atitikmuo
 
 \RequirePackage{setspace} % Intervalas tarp eilučių
 \RequirePackage[
@@ -162,7 +162,7 @@
         {\begin{tabular}[t]{l l}%
         \bigskip Atliko: &\; \@author \hfill \@signatureplace \\
         \bigskip Darbo vadovas: &\; \@supervisor \hfill  \@signatureplace \\
-        Darbo recenzentas: &\; \@reviewer \hfill \@signatureplace
+        % Darbo recenzentas: &\; \@reviewer \hfill \@signatureplace
         \end{tabular} \par}%
      \end{flushright}
   }{
@@ -212,8 +212,8 @@
   \global\let\@signatureplace\relax
   \global\let\checkifdefined\relax
   \setcounter{footnote}{0}%
-  % Nustatome dokumentui 1,5 tarpo tarp eilučių intervalą
-  \onehalfspacing
+  % Nustatome dokumentui 1,5 eilutės intervalą
+  \spacing{1.5}
 }
 
 % Skyriaus pavadinimas, turinyje neturintis numerio
