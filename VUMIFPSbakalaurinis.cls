@@ -162,7 +162,7 @@
         {\begin{tabular}[t]{l l}%
         \bigskip Atliko: &\; \@author \hfill \@signatureplace \\
         \bigskip Darbo vadovas: &\; \@supervisor \hfill  \@signatureplace \\
-        % Darbo recenzentas: &\; \@reviewer \hfill \@signatureplace
+        Darbo recenzentas: &\; \@reviewer \hfill \@signatureplace
         \end{tabular} \par}%
      \end{flushright}
   }{
