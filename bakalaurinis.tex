@@ -22,8 +22,8 @@
 \institute{Informatikos institutas}  % Užkomentavus šią eilutę - institutas neįtraukiamas į titulinį
 \department{Programų sistemų bakalauro studijų programa}
 \papertype{Bakalauro baigiamojo darbo planas}
-\title{Monolitų migravimas naudojant dekomponavimą pagal domenus ir „Mono2Micro”}
-\titleineng{Migrating a monolith using domain driven design and "Mono2Micro"}
+\title{IBM programos "Mono2Micro" tikslumo ir tinkamumo vertinimas monolitinių sistemų migravime}
+\titleineng{Evaluating the Accuracy and Usability of IBM's Mono2Micro in Microservice Migration}
 \author{Audrius Kumpis}
 % \secondauthor{Vardonis Pavardonis}   % Pridėti antrą autorių
 \supervisor{lekt. Vasilij Savin}
@@ -36,7 +36,22 @@
 \begin{document}
 \maketitle
 
-\sectionnonum{Darbo planas}
+\sectionnonumnocontent{Santrauka}
+Glaustai aprašomas darbo turinys: pristatoma nagrinėta problema ir padarytos
+išvados. Santraukos apimtis ne didesnė nei 0,5 puslapio. Santraukų gale
+nurodomi darbo raktiniai žodžiai.
+% Nurodomi iki 5 svarbiausių temos raktinių žodžių (terminų).
+% Vienas terminas gali susidėti iš kelių žodžių.
+\raktiniaizodziai{programų sistemų architektūra, mikroservisų architektūra, monolitinės sistemos, mono2micro, kokybės vertinimas}
+
+\sectionnonumnocontent{Summary}
+Santrauka anglų kalba. Santraukos apimtis ne didesnė nei 0,5 puslapio.
+\keywords{software architecture, microservices architecture, monolithic systems, mono2micro, software reliability}
+
+
+\tableofcontents
+
+\sectionnonum{Įvadas}
 Kai komanda pradeda kurti programą, monolitas įprastai yra numatytas pasirinkimas. Tai yra viena pagrindinių priežasčių, kodėl egzistuoja itin daug monolitinių sistemų. Monolitas turi savo duomenų bazę, savo funkcionalumo įgyvendinimą ir tai yra vientisa programa. Jis yra lengvai suprogramuojamas ir su palyginamai nedideliu darbo indėliu, galima greitai sukurti bei diegti veikiančią sistemą. Tačiau tokią architektūrą yra labai sunku plėtoti bei palaikyti. Kuo daugiau  tokia sistema yra plėtojama, tuo daugiau ji didėja, daugėja kodo bei priklausomybių nuo kitų sistemų. Diegimai tampa ilgi ir itin reti. Testavimas būna sudėtingas, nes negalima atlikti izoliuoto atskirų sistemos modulių testavimo. Kad ši problema būtų išspręsta, paprastai monolitinės sistemos yra skaidomos į mikroservisus.
 
 Mikroservisai – tai atskiri, nedideli servisai, kurie atsakingi už tam tikras specifines užduotis. Jie yra implementuoti kaip atskiros programos, o komunikacija tarp jų įprastai yra vykdoma per pranešimų siuntimo (angl. messaging) technologijas arba per REST API. Kiekvienas mikroservisas turi savo duomenų bazę, savo diegimo strategijas bei testavimo aplinką. Mikroservisų architektūra suteikia daug privalumų, pavyzdžiui:
@@ -49,101 +64,213 @@ Mikroservisai – tai atskiri, nedideli servisai, kurie atsakingi už tam tikras
 
 Nors mikroservisai išsprendžia daug problemų, tai nėra paprastas sprendimas. Kadangi migravimas į mikroservisų architektūrą yra pilnai techninė užduotis, privaloma gauti projekto vadovo ir/ar projekto savininko sutikimą, kad migracijai būtų skiriami resursai bei lėšos. Viena iš sunkesnių migracijos dalių yra mikroservisų projektavimas. Yra daugybė būdų, kaip galima išskaidyti monolitinę sistemą į mažesnius servisus \cite{FBZ+19}, taigi iš anksto apgalvoti, kokia strategija bus taikoma yra svarbu ir laiko, ir resursų atžvilgiu. Kad migracija iš monolitinės architektūros į mikroservisų būtų sklandi, reikia gerai žinoti, kokius darbus ir kokia tvarka būtina atlikti. Jau egzistuoja keletas migravimo atlikimo strategijų \cite{Wal22,MQO18,KXL+20}, su kuriomis susipažinus yra lengviau suplanuoti reikiamus darbus. Šiame darbe bus aptartos šios strategijos:
 \begin{itemize}
-    \item Dekomponavimas skaidant domenus.
+    \item Migravimas skaidant domenus.
     \item Visiškas sistemos perdarymas.
     \item Migravimas pasinaudojant dirbtiniu intelektu paremtą įrankį „Mono2Micro“.
 \end{itemize}
 
 \sectionnonum{Darbo tikslas ir uždaviniai}
-Darbo tikslas: atlikti tyrimą nagrinėjant „Mono2Micro“ techninės galimybės ir galimą migravimo naudą, įskaitant pagerintą mastelio keitimą, lankstumą ir priežiūrą. Tyrimo tikslas - nustatyti pagrindinius veiksnius, turinčius įtakos migravimo proceso sėkmei naudojant „Mono2Micro“, įvertinti šio metodo našumą, bei pateikti rekomendacijas organizacijoms, svarstančioms apie šio įrankio panaudojimą. Taip pat šio tyrimo tikslas yra prisidėti prie augančio žinių apie mikroservisų architektūrą kiekio ir pateikti praktinių įžvalgų informacinių technologijų specialistams, dalyvaujantiems programinės įrangos modernizavimo iniciatyvose.
+Darbo tikslas: įvertinti „Mono2Micro“ techninės galimybės bei pateikti rekomendacijas būsimiems įrankio naudotojams. Taip pat šio tyrimo tikslas yra prisidėti prie augančio žinių apie mikroservisų architektūrą kiekio ir pateikti praktinių įžvalgų informacinių technologijų specialistams, dalyvaujantiems programinės įrangos modernizavimo iniciatyvose.
 
-Tyrimo tikslams pasiekti bus atliekamos kelios užduotys. Pirma, bus analizuojama monolitinė programa, siekiant nustatyti jos pagrindines funkcijas ir priklausomybes. Antra, bus naudojamas įrankis „Mono2Micro“, kad monolitinė programa būtų migruota į mikroservisus, remiantis domenais orientuoto projektavimo principais. Trečia, bus įvertintas įrankio panaudojamumas atsižvelgiant į migravimui skirtus išteklius, pavyzdžiui, laiką ir/ar įrankio kainą.
+Šio darbo uždaviniai bus trys: darbe bus atlikta problemos analizė, bus atliktas eksperimentas, kurio tikslas bus įvertinti įrankio savybes, ir pagal eksperimento rezultatus atlikti įrankio vertinimą. Tyrimo tikslams pasiekti bus atliekamos kelios užduotys. Pirma, bus analizuojama monolitinė programa, siekiant nustatyti jos pagrindines funkcijas ir priklausomybes. Antra, bus naudojamas įrankis „Mono2Micro“, kad monolitinė programa būtų migruota į mikroservisų architektūrą, remiantis domenais grindžiamo projektavimo principais. Trečia, bus atliktas eksperimentas, kurio siekis bus įvertinti įrankio kokybiškumą atsižvelgiant į jo oficialius funkcinius reikalavimus. Atlikus šias užduotis bus padaryta išvada, ar „Mono2Micro“ yra tinkamas migravimo įrankis monolitinių sistemų migravimo į mikroservisų architektūrą darbui.
 
-Siekiant įvertinti migracijos metodo veiksmingumą, bus naudojami minėti našumo rodikliai, kad būtų galima palyginti monolitinės taikomosios programos ir sukurtos mikroservisų architektūros našumą. Architektūros lankstumas ir mastelio keitimas bus vertinamas pagal jos gebėjimą reaguoti į besikeičiančius verslo reikalavimus ir jos diegimo bei mastelio keitimo paprastumą.
-% Nurodomi iki 5 svarbiausių temos raktinių žodžių (terminų).
-% Vienas terminas gali susidėti iš kelių žodžių.
-% \raktiniaizodziai{raktinis žodis 1, raktinis žodis 2, raktinis žodis 3, raktinis žodis 4, raktinis žodis 5}   
+\section{Dekomponavimas skaidant domenus}
+Pirmiausia aptarsime vieną iš populiariausių migravimo strategijų – skaidymas pagal domenus \cite{Wal22}. Šią strategiją verta naudoti tuomet, kai verslo panaudos sritys yra aiškiai išskirtos. Dažnai  ši sąlyga būna neįgyvendinta, todėl yra itin svarbu į monolito pertvarkymo procesą įtraukti verslo atstovus, analitikus bei kitus techninius sistemos atstovus, kurie gerai supranta perdaromos sistemos funkcionalumą esančiame įgyvendinime.
 
-% \sectionnonumnocontent{Summary}
-% Santrauka anglų kalba. Santraukos apimtis ne didesnė nei 0,5 puslapio.
-% \keywords{keyword 1, keyword 2, keyword 3, keyword 4, keyword 5}
+\subsection{Strategijos aprašymas}
+Dekomponavimas skaidant domenus (angl. domain-driven refactoring) yra viena iš populiariausių migravimo strategijų. Ją geriausia naudoti tuomet, kai monolitas buvo kurtas laikantis domenais paremtu kūrimu (angl. domain-driven development). Tačiau ne visada būna taip, jog monolitas yra jau iš karto paruoštas migravimui. Pirmas ir svarbiausias žingsnis yra esminių domenų identifikavimas \cite{LZ22}. Kad esminių domenų identifikavimas būtų atliktas sėkmingai, privaloma įtraukti visus suinteresuotuosius asmenis minėtus anksčiau. Kad nauja architektūra tinkamai atliktų užduotis, privaloma investuoti laiko į monolito servisų sėkmingą migravimą į atskirus servisus. 
 
-% \tableofcontents
+Šios problemos sprendimas buvo pristatytas 2011 metais, o mikroservisų idėja buvo pristatyta 2005 metais. Sprendimo idėja yra paprasta: kai naujo domeno funkcionalumas yra įgyvendintas mikroservise ir jau yra paruoštas naudojimui, sistema perima naujojo mikroserviso funkcionalumą ir nebenaudoja jo iš senosios sistemos. Tai yra daroma su kiekvienu esminiu, atrinktu domenu. Tokiu būdu, monolitas yra „smaugiamas“ tol, kol jame nebebus nei vieno naudojamo domeno. Iš to ir seka šios taktikos pavadinimas – „Smaugiko šablonas“ \cite{Beh18}. Šis šablonas yra taikomas beveik visuomet, kai yra naudojamas dekomponavimo pagal domenus strategija.
 
-% \sectionnonum{Įvadas}
-% Įvade nurodomas darbo tikslas ir uždaviniai, kuriais bus įgyvendinamas tikslas,
-% aprašomas temos aktualumas, apibrėžiamas tiriamasis objektas akcentuojant
-% neapibrėžtumą, kuris bus išspręstas darbe, aptariamos teorinės darbo prielaidos
-% bei metodika, apibūdinami su tema susiję literatūros ar kitokie šaltiniai,
-% temos analizės tvarka, darbo atlikimo aplinkybės, pateikiama žinių apie
-% naudojamus instrumentus (programas ir kt., jei darbe yra eksperimentinė dalis).
-% Darbo įvadas neturi būti dėstymo santrauka. Įvado apimtis 2--4 puslapiai.
+\subsection{Strategijos pritaikymas}
+Šiame pavyzdyje naudojama fiktyvi paskolų išdavimo sistema. Šioje sistemoje yra naudojami 5 esminiai domenai: autentikacijos, paskolos dydžio skaičiuoklė, išmokėjimo mechanizmas, kreditingumo skaičiuoklė, transakcijų gavimo mechanizmas. Visi šie domenai veikia darnoje ir yra priklausomi vienas nuo kito. Jų veikimas pavaizduotas šioje diagramoje:
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.9]{img/komponentu-diagrama.png}
+    \caption{Dabartinio monolito komponentų diagrama}
+    \label{img:komponentu-diagrama}
+\end{figure}
 
-% \section{Medžiagos darbo tema dėstymo skyriai}
-% Medžiagos darbo tema dėstymo skyriuose išsamiai pateikiamos nagrinėjamos temos
-% detalės: pradiniai duomenys, jų analizės ir apdorojimo metodai, sprendimų
-% įgyvendinimas, gautų rezultatų apibendrinimas.
+Visi šie domenai – komponentai – priklauso vienas nuo kito. Jei bent vienas neveikia, arba veiks klaidingai, tai atneš nenumatytų nuostolių verslui. Pasinaudojant „smaugiko“ šablonu, iteratyviai kiekvienam išskirtam domenui, yra sukuriamas mikroservisas. Kūrimo metu yra privaloma užtikrinti, jog bendras sistemos veikimas nėra sugadinamas, jog sistema vis dar veikia korektiškai. Kad tai būtų užtikrinta, privaloma kuo anksčiau sukonfigūruoti pastovaus diegimo/pastovaus testavimo liniją. (angl. CI/CD pipeline)  Supaprastintą šablono panaudojimą galima pamatyti \ref{img:smaugiko-sablonas} pav.
 
-% Medžiaga turi būti dėstoma aiškiai, pateikiant argumentus. Tekste dėstomas
-% trečiuoju asmeniu, t.y. rašoma ne \enquote{aš manau}, bet „autorius mano“, „autoriaus
-% nuomone“. Reikėtų vengti informacijos nesuteikiančių frazių, pvz., „...kaip jau
-% buvo minėta...“, „...kaip visiems žinoma...“ ir pan., vengti grožinės
-% literatūros ar publicistinio stiliaus, gausių metaforų ar panašių meninės
-% išraiškos priemonių.
+\begin{figure}[H]
+    \centering
+    \includegraphics{img/smaugiko-sablonas.png}
+    \caption{„Smaugiko“ šablono įgyvendinimas}
+    \label{img:smaugiko-sablonas}
+\end{figure}
 
-% Skyriai gali turėti poskyrius ir smulkesnes sudėtines dalis, kaip punktus ir
-% papunkčius.
+Naujai sukurtiems mikroservisams yra būtina kuo anksčiau priskirti atsakingas komandas. Šios komandos bus atsakingos už tolimesnius mikroservisų darbus, priežiūrą, keitimus, bei teisingos integracijos su dar laikinai naudojamu monolitu užtikrinimą. Taigi prieš visą migraciją privaloma įsivertinti, ar programavimo komandoje pakanka resursų priskirti žmones specifiniams mikroservisams.
 
-% \subsection{Poskyris}
-% Citavimo pavyzdžiai: cituojamas vienas šaltinis \cite{PvzStraipsnLt}; cituojami
-% keli šaltiniai \cite{PvzStraipsnEn, PvzKonfLt, PvzKonfEn, PvzKnygLt, PvzKnygEn,
-% PvzElPubLt, PvzElPubEn, PvzMagistrLt, PvzPhdEn}.
+Iš karto gali kilti klausimas: kaip atsirinkti, ką pirmiausia reikia iškelti į naują mikroservisą? Jei šis šablonas yra taikomas pirmą kartą programavimo komandoje, saugiausias variantas būtų pradėti nuo mažiausiai reikšmingo ir/ar mažiausio pagal dydį komponento. Tokiu būdu, komanda įgautų daugiau patirties darbui labiau svarbiems komponentams. Be šito, kiti galimi kandidatai yra \cite{Beh18}:
+\begin{itemize}
+    \item Komponentai, kurie yra labiausiai užbaigti. Jie turi didžiausią padengimo testais procentą, mažiausiai neužbaigtų techninių darbų. Programavimo komanda tuomet jaustųsi saugiausiai migruodama šį komponentą.
+    
+    \item Komponentai, kurie tikėtina, jog plėsis labiausiai. Iškėlus juos į mikroservisus pirmiausia, tikėtina, jog reikės perkelti mažiau kodo, nei tą darbą atliekant vėliau.
+    
+    \item Komponentai, kurie dažniausiai kinta dėl besikeičiančių verslo reikalavimų. Tai užtikrintų, jog atliekant verslo reikalaujamus pakeitimus, nereiktų diegti viso monolito, užtektų diegti tik naują mikroservisą.\\
+\end{itemize}
 
-% \subsection{Faktorialo algoritmas}
+\subsection{Įvertinimas}
+Taigi, šią migravimo strategiją rekomenduojama naudoti tuomet, kai yra aiškiai apibrėžti domenai, arba jei yra galimybė įtraukti verslo atstovus aiškių esminių domenų identifikavimui. Tačiau ši strategija nėra tinkama visiems atvejams. Jos nerekomenduojama naudoti tuomet, kai monolitas yra dar itin mažos apimties ir neturi aiškiai apibrėžtų esminių domenų. Priešingu atveju, gali būti brangu sumodeliuoti, kurti bei prižiūrėti naujai sukurtus mikroservisus. Naudojantis šia strategija, atliekamo pertvarkymo darbo laikas tiesiogiai priklauso nuo esamo monolito dydžio. Kuo didesnis monolitas, tuo ilgiau truks jį išskaidyti. Sunkiausia dalis visgi lieka esminių domenų identifikavimas. Taip pat, jei esamame monolite yra didelis kodo padengimas funkciniais testais, tai gali padėti užtikrinti, jog migravimas bus sėkmingas ir reikės atlikti mažiau pilno testavimo rankiniu būdu.
 
-% \ref{alg:factorial} pav. pateiktas faktorialo algoritmas.
+\section{Pilnas sistemos perdarymas}
+Nors tai dažnai yra laikoma kraštutine strategija, ją taip pat yra būtina paminėti. Kai esama sistema neatlieka savo verslo funkcijų tinkamai, kai sistemą yra sunku naudoti arba kai sistema yra sukurta naudojant pasenusiomis technologijomis, tada šį monolito migravimo būdą verta apmąstyti \cite{MQO18}.
 
-% \begin{algorithm}
-% \begin{algorithmic}[1] % [1] padaro, kad eilutės būtų sunumeruotos
-% \State $N\gets$ skaičius, kurio faktorialą skaičiuojame
-% \State $F\gets 1$
-% \For{$i := 2$ $to$ $N$}
-%     \State $F\gets F \cdot i$
-% \EndFor
-% \end{algorithmic}
-% \caption{Faktorialo algoritmas}
-% \label{alg:factorial}
-% \end{algorithm}
+\subsection{Strategijos aprašymas}
+Priežasčių pilnam sistemos perdarymui gali būti daug, pavyzdžiui:
+\begin{itemize}
+    \item Aukšti esamos sistemos palaikymo kaštai \cite{Gli21}. Senoms sistemoms reikia daugiau jas gebančių palaikyti specialistų. Jei monolitas buvo sukurtas su jau pasenusiomis technologijomis, tokių specialistų atrasti gali būti sunku. Jei ir randami šie specialistai, jie bus priskirti prie projekto palaikymo komandos ir tik prižiūrės esamą sistemą, kuri gali veikti klaidingai, arba visai neveikti.
+    
+    \item Nepritaikymas esamiems įstatymams. Jei yra išleidžiami nauji įstatymai, kurie apriboja buvusius sistemos panaudos atvejus, esamą monolitinę sistemą pritaikyti pagal tuos įstatymus gali būti labai sudėtinga. Potencialiai, jie gali pakeisti visą verslo logiką, duomenų struktūrą.
+    
+    \item Pasenusios technologijos \cite{MQO18}. Surasti specialistus, kurie sugeba palaikyti sistemą, kuri buvo sukurta su senomis technologijomis, gali būti labai sudėtinga. Tokiu atveju sėkmingas verslo užduočių veikimas  yra itin priklausomas nuo specialistų, kurie dirba įmonėje. Idealiu atveju, verslo veiksmingumas neturėtų priklausyti nuo tokių faktorių. Taip pat, senos technologijos reiškia pasenusius saugumo standartus. Sistema tampa mažiau saugi naudoti ir, natūraliai, mažiau patraukli būsimiems ir esamiems vartotojams.\\
+\end{itemize}
 
-% \subsubsection{Punktas}
-% \subsubsubsection{Papunktis}
-% \subsubsection{Punktas}
-% \section{Skyrius}
-% \subsection{Poskyris}
-% \subsection{Poskyris}
+Įvertinus esamą sistemą, galima apgalvoti apie sprendimą ją perdaryti ir tuo pačiu pereiti prie mikroservisų architektūros. Bendru atveju, sistemos perdarymas yra vienodai sudėtingas darbas, lyginant su naujos sistemos sukūrimu, taigi yra būtina gauti visos komandos, produkto savininko, projekto vadovo ir kitų suinteresuotųjų asmenų pritarimą sistemos perdarymui. Po įvykdomumo analizės bei reikalavimų surinkimo, belieka įvykdyti sistemos perdarymą. Vykdymas gali būti daromas daugeliu būdų, tačiau čia yra aprašyti du populiariausi metodai: „didžiojo sprogimo“ \cite{Ngu11} metodas ir patobulintas perdarymo mechanizmas \cite{MQO18} (angl. enhanced re-engineering mechanism).
 
-% \sectionnonum{Rezultatai ir išvados}
-% Rezultatų ir išvadų dalyje išdėstomi pagrindiniai darbo rezultatai (kažkas
-% išanalizuota, kažkas sukurta, kažkas įdiegta), toliau pateikiamos išvados
-% (daromi nagrinėtų problemų sprendimo metodų palyginimai, siūlomos
-% rekomendacijos, akcentuojamos naujovės). Rezultatai ir išvados pateikiami
-% sunumeruotų (gali būti hierarchiniai) sąrašų pavidalu. Darbo rezultatai turi
-% atitikti darbo tikslą.
+\subsection{Strategijos pritaikymas}
+„Didžiojo sprogimo“ metodo idėja yra paprasta. Pagrindinis tikslas yra perdaryti visą sistemą vienu metu. Šis metodas įprastai yra pasirenkamas, kai projekto problemą reikia išspręsti kuo greičiau, pvz., pakeisti sistemos architektūrą \cite{Ngu11}. Šis metodas yra itin lankstus, galima atsisakyti nereikalingų sąsajų, galima iš karto prisitaikyti prie naujos diegimo aplinkos. Tačiau šio metodo pritaikymas labai priklauso nuo konkretaus projekto. Metodas netinka labai didelėms sistemoms, nes sunaudojama labai daug resursų. Naudojant šį metodą rizika, jog projektas–perdarymas nepasiseks yra didelė, nes visas procesas trunka panašiai tiek pat ilgai, kaip kuriant visiškai naują sistemą.
+\begin{figure}[H]
+    \centering
+    \includegraphics{img/didziojo-sprogimo-metodas.png}
+    \caption{„Didžiojo sprogimo“ metodas}
+    \label{img:didziojo-sprogimo-metodas}
+\end{figure}
 
-\printbibliography[heading=bibintoc]  % Šaltinių sąraše nurodoma panaudota
-% literatūra, kitokie šaltiniai. Abėcėlės tvarka išdėstomi darbe panaudotų
-% (cituotų, perfrazuotų ar bent paminėtų) mokslo leidinių, kitokių publikacijų
-% bibliografiniai aprašai. Šaltinių sąrašas spausdinamas iš naujo puslapio.
-% Aprašai pateikiami netransliteruoti. Šaltinių sąraše negali būti tokių
-% šaltinių, kurie nebuvo paminėti tekste (LaTeX tai sutvarko automatiškai).
-% Šaltinių sąraše rekomenduojame necituoti savo kursinio darbo, nes tai nėra
-% oficialus literatūros šaltinis. Jei tokių nuorodų reikia, pateikti jas tekste.
+Patobulintas perdarymo mechanizmas yra labiau struktūrizuotas procesas, savo žingsniais primenantis klasikinį programų kūrimo procesą. Pirma, yra atliekama įvykdomumo analizė, o tada surenkami reikalavimai naujai sistemai. Turint naujus reikalavimus, pereinama prie programavimo fazės. Atlikus programavimą, atliekamas testavimas, naujų algoritmų palyginimas su sena sistema, naujų technologijų siūlymai ir pakartotinis testavimas. Procesas tęsiasi tol, kol bus pasiektas norimas atnaujinimo lygis. Šis metodas sumažina sistemos perdarymo kompleksiškumą, pagerina naujai perdarytą sistemą ir užtikrina, jog visi reikiami komponentai bus sėkmingai suintegruoti.
 
-% % \sectionnonum{Sąvokų apibrėžimai}
-% \sectionnonum{Santrumpos}
-% Sąvokų apibrėžimai ir santrumpų sąrašas sudaromas tada, kai darbo tekste
-% vartojami specialūs paaiškinimo reikalaujantys terminai ir rečiau sutinkamos
-% santrumpos.
+\begin{figure}[H]
+    \centering
+    \includegraphics{img/patobulintas-perdarymas.png}
+    \caption{Patobulintas perdarymo mechanizmas \cite{MQO18}}
+    \label{img:patobulintas-perdarymas}
+\end{figure}
+
+\subsection{Įvertinimas}
+Visiškas sistemos perdarymas dažnu atveju yra kraštutinė monolito migravimo priemonė, tačiau tinkamomis sąlygomis šis metodas atneša daugiau naudos nei tradicinės monolito migravimo strategijos. Pastebėjus didelį kiekį problemų su esama sistema, galima apmąstyti ne tik apie esamo monolito modernizavimą, bet ir migravimą į mikroservisų architektūrą. Tačiau nedidelis kiekis įmonių yra linkusių pasinaudoti šiuo migravimo metodu, nes jis yra itin ilgai trunkantis ir kainuoja daug resursų \cite{MQO18}. Pastebėta, jog yra modernizavimui skirtų įrankių trūkumas. Jei trūkumo nebūtų, tai galėtų paskatinti esamų senų sistemų modernizavimą ir pertvarkymą į mikroservisų architektūrą.
+
+\section{Dekomponavimas naudojant „Mono2Micro”}
+Per pastaruosius metus šis metodas pritraukė daug dėmesio. Jo pagalba galima palengvintu būdu atskirti esminius domenus bei juos iškelti į naujus mikroservisus. Naudojantis šiuo įrankiu klaidų tikimybė yra tikėtinai mažesnė, monolito migravimas tampa greitesnis už tradicinius metodus bei turi galimybę paruošti naujus mikroservisus būti naudojamiems debesijoje (angl. cloud computing). Šio darbo rašymo metu, įrankis sėkmingai atlieka migravimo užduotis tik su Java kalba parašytoms programoms, tačiau ateityje yra numatoma apjungti ir kito tipo programas \cite{KXL+20}.
+
+\subsection{Strategijos aprašymas}
+„Mono2Micro“ (toliau įrankis) yra dirbtinio intelekto pagalba sukurtas įrankių rinkinys, kuris padeda pertvarkyti esamą seną sistemą į mikroservisų architektūrą. Įrankis leidžia vartotojui pasirinkti norimus panaudos atvejus ir veikimo metu juos priskirti esančioms klasėms, servisams. Įrankis taip pat atlieka statinę programos analizę ir surenka programos struktūrinę informaciją bei priklausomybes. Šią informaciją tuomet analizuoja dirbtinio intelekto variklis ir sukuria programos padalinius (angl. partitions) pagal verslo panaudos atvejų ir priklausomybių panašumą bei panaudojimą. Sugeneruoti padaliniai yra potencialūs kandidatai naujam mikroservisui. Vartotojas gali peržiūrėti šiuos padalinius, juos redaguoti ar kitaip grupuoti, kad būtų gautas kuo tikslesnis norimas mikroservisas \cite{KXK+21}. Taip pat, kartu su verslo panaudos atvejais, įrankis sugeneruoja natūraliai panašius padalinius. Jie skiriasi tuo, jog nėra analizuojama duomenų priklausomybė. Taip galima supaprastinti duomenų priklausomybes tarp sugeneruotų padalinių.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics{img/mono-2-micro-veikimas.png}
+    \caption{Verslo panaudos atvejų ir natūraliai panašių padalinių generavimas naudojantis „Mono2Micro“ įrankiu \cite{KXL+20}.}
+    \label{img:mono-2-micro}
+\end{figure}
+
+Kad įrankis sugeneruotų tikslius panaudos atvejus, programa kurią norima pertvarkyti yra paleidžiama. Kai ji pradeda veikti, per vartotojo sąsają būtina atlikti visus panaudos atvejus. Jei kuris nors atvejis bus praleistas, įrankis ieškos daugiau panaudos atvejų funkciniuose testuose. Visa ši informacija yra surenkama į orientuotą grafą $(V, E)$. kur $V$ yra klasės, $E$ yra veikimo metu nustatyti metodų kvietimo sąryšiai tarp klasių \cite{KXL+20}. Sugeneruoto grafo pavyzdys parodomas \ref{img:mono-micro-grafas} pav.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics{img/mono-micro-grafas.png}
+    \caption{Veikimo metu sugeneruotas orientuotas grafas $(V, E)$, parodantis dinaminius sąryšius tarp klasių \cite{KXL+20}.}
+    \label{img:mono-micro-grafas}
+\end{figure}
+
+Surinkus visą reikiamą informaciją apie klases ir jų ryšius, įrankis gali pasinaudoti šiais duomenimis bei sugeneruotu kvietimo konteksto medžiu (angl. calling-context tree), kad sukurtų padalinių rekomendacijas. Turint norimą padalinių skaičių $k$ ir klasių aibę $C = {c_{1}, c_{2}, ..., c_{n}}$ galima sugrupuoti klases pasinaudojant šia panašumo formule \cite{KXL+20}.
+
+\begin{equation}\label{eq:panasumo-formule}
+    Sim_{i,j} = \frac{\sum_{m=o}^{n_{i}}\sum_{n=0}^{n_{j}}S(c_{im},C_{jn})}{\left| C_{i} \right|\left| C_{j} \right|}
+\end{equation}
+
+Panašumo dydis yra apskaičiuojamas remiantis tiesioginiais ir netiesioginiais kvietimų ryšiais tarp klasių $c_{i}$ ir $c_{j}$. Tiesioginio kvietimo ryšys egzistuoja tik tuomet, kai ryšys tarp klasių $c_{i}$ ir $c_{j}$ kvietimo konteksto medyje egzistuoja briauna $(c_{i}, c_{j})$. Netiesioginio kvietimo ryšys tarp klasių $c_{i}$ ir $c_{j}$ egzistuoja tik tuomet, jei konteksto kvietimo medyje egzistuoja kelias $(c_{i}, c_{2}, ..., c_{p}, c_{j}), p > 1$.
+
+Kai yra sugeneruojami padaliniai pagal panaudos atvejų panašumą, įrankis juos sujungia pagal natūralų panašumą. Jei klasės $c_{i}$ ir $c_{j}$ turi ryšių, jos yra priskiriamos vienam padaliniui. Tokiu būdu pereinama per visas visų padalinių klases ir gaunamas optimalus natūraliai panašių padalinių skaičius.
+
+\subsection{Strategijos pritaikymas}
+Šiai strategijai išbandyti naudojama populiari „IBM“ sukurta etaloninė programa „DayTrader“ \cite{IBM15}. Tai yra elektroninė akcijų pirkimo ir pardavimo programa. Ji leidžia vartotojui prisijungti, peržiūrėti savo profilį, peržiūrėti esamas akcijas, jų kainas bei kainų istoriją, pirkti bei parduoti akcijas. Joje yra 112 klasių ir 964 metodų. Kodo padengimas funkciniais testais: padengta  66 \% klasių, 44 \% metodų. Pasinaudojus įrankiu ir nurodžius padalinių skaičių $k = 7$ gauname rekomenduojamus 3 padalinius $p_{1}, p_{2}, p_{3}$.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics{img/mono-micro-padaliniai.png}
+    \caption{Sugeneruoti padaliniai „DayTrader“ programai, kai $k = 7$, \cite{KXK+21}}
+    \label{img:mono-micro-padaliniai}
+\end{figure}
+
+Padalinyje $p_{1}$ yra priskiriamos klasės, susijusios su akcijų pirkimo ir pardavimo funkcionalumu, $p_{2}$ yra priskiriamos klasės, susijusios su duomenų bazės operacijomis, o $p_{3}$ yra priskiriamos klasės susijusios su įvairių pranešimų siuntimu. Šie padaliniai buvo suskirstyti pagal atliekamas programines funkcijas ir jie nėra glaudžiai susiję su verslo moduliais pasinaudojant įrankio padalinių sujungėju. Parodžius šiuos rezultatus programinės įrangos architektams, kurie yra susipažinę su šia programa, jie patvirtino, jog šie „Mono2Micro“ sugeneruoti mikroservisų patarimai yra logiški ir prasmingi \cite{KXL+20}.\\
+
+\subsection{Įvertinimas}
+„Mono2Micro“ tinka sugeneruoti esamo Java EE monolito pertvarkymo rekomendacijoms. Šis įrankis yra lankstus, suteikiantis daug patarimų ir rekomendacijų, ir parodė, jog veikia gerai su vidutinio dydžio Java Spring programomis \cite{San21}. Tačiau įrankis daugiau dėmesio skiria sugrupuoti esamas klases pagal jų techninį funkcionalumą, o ne pagal verslo panaudos atvejus, kas yra įprastas mikroservisų tikslas. Taip pat pastebėtina, jog šis įrankis gali būti naudojamas ne tik monolito paruošimui mikroservisų architektūrai, bet ir patikrinimui, ar monolitą tikrai verta skaldyti į atskirus mikroservisus. Jei gaunamas rekomenduotinų padalinių skaičius yra nedidelis (pvz., 2), tai verta pamąstyti, ar apsimoka skirti laiko ir resursų šiam sudėtingam darbui. Nors šis įrankis šiuo metu veikia tik su Java programomis, tikėtina, jog jis ateityje palengvins ir kitokio tipo programų pertvarkymą.
+
+\section{„Mono2Micro“ praktinis pritaikymas}
+Šiame darbe bus atliekamas monolitinės sistemos „Oopsie Daisy“ migravimas naudojantis „Mono2Micro“ migravimo įrankiu. Migravimo metu bus vertinamas šio įrankio patikimumas, pagrįstumas bei panaudojamumas. Šio eksperimento rezultatai priklauso nuo aplinkos, kurioje jie yra vykdomi. Vykdant kontroliuojamus eksperimentus bus manipuliuojama nepriklausomais kintamaisiais. Tikėtinas šių eksperimentų rezultatas yra aukštas įrankio patikimumas bei panaudojamumas. Taip pat pastabos, patarimai ir įžvalgos, kaip šis įrankis gali būti pagerintas ar kaip juo naudotis, kad būtų pasiektas geriausias migravimo rezultatas.
+
+Atlikus šiuos eksperimentus bus atlikta monolitinės sistemos migracija į „Mono2Micro“ parekomenduotus mikroservisus. Tada bus patikrinama, ar ši nauja sistema vis dar atlieka jai būdingus panaudos atvejus, bus lyginamas jos ir monolitinės sistemos našumas bei plečiamumas.
+
+\subsection{Pasiruošimas vertinimui}
+% nežinau, ar verta šitai paminėti
+„Mono2Micro“ yra mokamas IBM įrankis, skirtas atlikti migravimą IBM WebSphere Open Liberty serveryje, tačiau šis įrankis pateikia mikroservisų rekomendacijas nepriklausomai nuo vykdomosios aplinkos. Šio įrankio bandomąją 3 mėnesių versiją gali pasiimti bet kas, susikūręs paskyrą IBM svetainėje. Kad įrankis veiktų, privaloma savo aplinkoje būti sudiegus Docker technologiją.
+
+„Mono2Micro“ veikia terminalo aplinkoje, naudojant kelias pagrindines komandas \cite{IBMM2M}:
+\begin{itemize}
+    \item \verb|mono2micro analyze -a <dir-to-jar-file>| -- ši komanda atlieka statinę Java programos analizę ir sukuria pirminius duomenis, kuriuos vėliau naudos dirbtinio intelekto variklis.
+
+    \item \verb|mono2micro usecase -o <dir-to-output.json>| -- ši komanda atlieka chronometro vaidmenį. Po šios komandos vykdymo, įrankio vartotojas įveda panaudos atvejo pavadinimą ir atlieka šį panaudos atvejį monolitinėje sistemoje, kuri išsaugo visus sisteminius pranešimus į žurnalą. Šie duomenys padeda nustatyti, kada prasideda koks panaudos atvejis.
+
+    \item \verb|mono2micro recommend -d <dir-to-contexts>| -- ši komanda atlieka sugeneruotų failų analizę ir dirbtinio intelekto pagalba sugeneruoja orientuoto grafo .json failą. Šiame faile yra visos programoje naudotos Java klasės bei jų tarpusavio ryšiai. Šios klasės gali būti sugrupuotos pagal panaudos atvejus, arba pagal natūralių gijų panašumus (natural seams).
+
+    \item \verb|mono2micro workbench| -- ši komanda įjungia interaktyvią aplinką, kurioje galima peržiūrėti bei modifikuoti praėjusioje komandoje sugeneruoto orientuoto grafo duomenis.
+
+    \item \verb|mono2micro generate| -- ši komanda sugeneruoja atskirus mikroservisus pagal sugeneruoto grafo duomenis.
+\end{itemize}
+
+Įvykdžius šias komandas yra atliekamas pilnas monolitinės sistemos perdarymas. Kiekviena atskira komanda atlieka skirtingas užduotis, tačiau jei bent viena atlieka savo užduotį klaidingai, tai visos sekančios komandos taip pat neveiks. 
+
+\subsubsection{Įrankio patikimumo vertinimas}
+Programinės įrangos patikimumo vertinimas yra vienas būtiniausių matų, kuris nurodo programinės įrangos kokybę bei gali padėti suprasti, kiek priežiūros jai gali prireikti \cite{MarCY}. Įrankio patikimumui vertinti bus atliekamas jo rezultatų patikimumo skaičiavimo eksperimentas. Vertinant „Mono2Micro“ patikimumą yra privaloma atsižvelgti į rodiklius, kurie tiksliai atspindėtų jo našumą bei naudingumą pertvarkant monolitines Java programas į mikroservisų architektūrą. Šiame darbe bus naudojami 2 rodikliai:
+\begin{itemize}
+    % reik kitos metrikos, mean time sounds bad
+    \item Mikroservisų rekomendacijų tikslumas -- rodiklis, kuris palygina „Mono2Micro“ rezultatus su programinės įrangos kūrimo ekspertų sprendimais. Šį matą yra galima išreikšti pagal rekomendacijų, atitinkančių ekspertų sprendimus, procentinę dalį, taip nustatant aiškų, išmatuojamą patikimumo rodiklį. Laikoma, jog kuo didesnis panašumo dydis procentais, tuo įrankis patikimesnis.
+
+    \item Sėkmingo vykdymo rodiklis -- rodiklis, kuris nurodo skaičių atvejų, kai „Mono2Micro“ nesusiduria su klaidomis ar problemomis. Didesnis rodiklis nurodo didesnį įrankio patikimumą.
+    \newline 
+    
+    % \item MTTF (Mean Time To Failure) -- atliekamas tos pačios komandos vykdymas N kartų. Tikrinama, kas kiek atlikimų rezultatas yra klaidingas. Tikėtina, jog vykdant komandas su tais pačiais duomenimis ir parametrais, rezultatas bus vienodas ir įrankis atliks užduotis be klaidų. Šiame kontekste, klaida yra neteisingas/nelogiškas mikroservisų rekomendavimas arba įrankio neveikimas.
+
+    % \item MTTR (Mean Time To Repair) -- matas parodantis, kiek ilgai laiko vienetų trunka pataisyti kilusias klaidas, jei jų yra. Šiame kontekste, tai būtų kiek laiko trunka rankomis sudėti reikiamas klases į mikroservisus grafų faile.
+
+    % \item MTBF (Mean Time Between Failure) -- matas, kurio dydis yra MTTF + MTTR. Jis nurodo, kas kiek laiko vienetų yra tikėtina klaida. Kuo didesnis šis matas, tuo programinė įranga yra patikimesnė.
+
+\end{itemize}
+
+IBM „Mono2Micro“ kontekste tradiciniai patikimumo rodikliai, tokie kaip vidutinis laikas iki gedimo (MTTF) arba vidutinis laikas tarp gedimų (MTBF), nėra itin svarbūs ar taikytini. Pirmiausia todėl, kad „Mono2Micro“ nėra sistema, kuri veikia nuolat ir kuriai laikui bėgant gresia gedimo rizika, o būtent šiems rodikliams matuoti šie rodikliai ir yra skirti. Vietoj to, „Mono2Micro“ yra priemonė, kurioje pateikiamos rekomendacijos, kaip monolitinę „Java“ programą pertvarkyti į mikroservisus. Šiame kontekste „nesėkmės“ sąvoka yra kitokia ir ją tiksliau atspindi tokios metrikos kaip priemonės rekomendacijų tikslumas arba sėkmingo vykdymo be klaidų rodiklis. MTTF ir MTBF labiau tinka sistemoms, kuriose gedimai apibrėžiami kaip visiški sistemos gedimai, kuriuos reikia taisyti arba paleisti iš naujo, o tai netaikoma tokiai priemonei kaip „Mono2Micro“. Taigi, siekdami prasmingai įvertinti šios priemonės patikimumą, daugiausia dėmesio skiriame rodikliams, labiau susijusiems su konkrečiomis šios priemonės funkcijomis ir tikėtiniems rezultatais.
+\subsubsection{Rezultatų pagrįstumas}
+ % papasakoti daugiau apie rezultatų pagrįstumą?
+Rezultatų pagrįstumas programų sistemų inžinerijoje yra svarbus konceptas siekiant įrodyti, jog atlikti patikimumo eksperimentai tikrai įvertina programos kokybę, t.y. vertina tai, ką ir privalo vertinti \cite{LMPV}. „Mono2Micro“ kontekste, siekiant įvertinti rezultatų pagrįstumą, bus atsižvelgta į įgyvendinimo sėkmės rodiklį, t.y. rekomenduojamų mikroservisų, kurie, juos įdiegus, be sutrikimų atlieka numatytas funkcijas ir prisideda prie bendro sistemos funkcionalumo gerinimo, procentinę dalį. Ši metrika nurodys, ar naujai pertvarkyta programa vis dar teisingai atlieka savo užduotis ir ar įrankis migravimo metu nepanaikina kritinių programos dalių.
+
+\subsubsection{Įrankio panaudojamumas}
+Šitame žingsnyje bus aprašoma, kaip patogu yra naudotis „Mono2Micro“ įrankiu, ar vartotojo sąsaja yra suprantama ir ar dokumentacija yra pakankama. Įprastai, šis panaudojamumas yra vertinamas atliekant naudotojų apklausas ar stebint jų naudojimąsi programa, tačiau kadangi šio darbo autorius pirmą kartą naudojosi šia programa, įrankio panaudojamumo rezultatai nebus šališki ir bus galima juos laikyti patikimais rezultatais.
+% Pridet dar ka nors?
+
+\subsection{Mikroservisų rekomendacijų tikslumas}
+PLACEHOLDER Parašyti kokie mikroservisai buvo naudojami, koks work flow buvo.
+
+\subsection{Sėkmingo vykdymo rodiklis}
+PLACEHOLDER Kiek dažnai vykdant eksperimentus m2c nuluzdavo, ar tiesiog veikdavo netiketai blogai
+
+\subsection{Rezultatų pagrįstumas}
+PLACEHOLDER Parasyt kaip veikė nauja architektura, gal performacne diagramu ideti
+
+\subsection{Įrankio panaudojamumo vertinimas}
+PLACEHOLDER Parasyt ar sudetingai buvo naudotis siuo irankiu is mano persperktyvos: dokumentacija, terminalo interfeisas, workbench supratimas, pasiulymai, rekomendacijos
+
+\subsection{Patarimai ir rekomendacijos} % o gal \section{} ?
+PLACEHOLDER ko tiketis naudojantis siuo irankiu, kaip paruosti appsa, ko nera dokumentacijoje, su kokiomis problemomis galima susidurti
+
+
+\sectionnonum{Rezultatai}
+PLACEHOLDER Ka as padariau, ka ismokau, atlikau, sumodeliavau, isbandziau, supratau, etc
+
+\sectionnonum{Išvados}
+PLACEHOLDER isvados apie tai kaip mono micro veikia, ar tinkamas irankis large scale programoms, ar verta ji naudoti, ar pats irankis kokybiskas, ar patikimas
+
+
+\printbibliography[heading=bibintoc]
 
 % \appendix  % Priedai
 % % Prieduose gali būti pateikiama pagalbinė, ypač darbo autoriaus savarankiškai
@@ -158,21 +285,5 @@ Siekiant įvertinti migracijos metodo veiksmingumą, bus naudojami minėti našu
 %     \caption{Paveikslėlio pavyzdys}
 %     \label{img:mlp}
 % \end{figure}
-
-
-% \section{Eksperimentinio palyginimo rezultatai}
-% % tablesgenerator.com - converts calculators (e.g. excel) tables to LaTeX
-% \begin{table}[H]\footnotesize
-%   \centering
-%   \caption{Lentelės pavyzdys}
-%   {\begin{tabular}{|l|c|c|} \hline
-%     Algoritmas & $\bar{x}$ & $\sigma^{2}$ \\
-%     \hline
-%     Algoritmas A  & 1.6335    & 0.5584       \\
-%     Algoritmas B  & 1.7395    & 0.5647       \\
-%     \hline
-%   \end{tabular}}
-%   \label{tab:table example}
-% \end{table}
 
 \end{document}
