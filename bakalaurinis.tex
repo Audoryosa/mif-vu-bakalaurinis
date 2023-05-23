@@ -206,7 +206,7 @@ Rezultatų pagrįstumas programų sistemų inžinerijoje yra svarbus konceptas s
 % Pridet dar ka nors?
 
 \subsection{Mikroservisų rekomendacijų tikslumas}
-Šiame darbe „Mono2Micro“ bus naudojamas monolitinės sistemos „E Shop“ migravimui į mikroservisų architektūrą. Šis monolitas yra parašytas Java kalba, su Spring Boot karkasu. Šiame monolite yra 65 Java klasių failai ir 8 skirtingi REST kvietimai. Monolitas naudoja vieną duomenų bazę ir 4 lenteles.
+Šiame darbe „Mono2Micro“ bus naudojamas monolitinės sistemos „E Shop“ migravimui į mikroservisų architektūrą. Šis monolitas yra parašytas Java kalba, su Spring Boot karkasu. Šiame monolite yra 65 Java klasių failai ir 8 skirtingi REST kvietimai. Monolitas naudoja vieną duomenų bazę ir 4 lenteles. Ši programa turi daugiau nei 90 \% kodo padengimą testais.
 
 Šios programos pagrindiniai panaudos atvejai yra vartotojų prisijungimas bei registracija, administratoriaus prisijungimas bei registracija, prekių pridėjimas, gavimas, filtravimas, išėmimas, mokėjimų inicijavimas, elektroninio laiško siuntimas.
 
@@ -265,7 +265,7 @@ Galima pastebėti, jog yra klasių, kurios nebuvo priskirtos jokiam mikroservisu
 Kadangi duomenų ryšiai šioje programoje yra paprasti ir lentelės nenaudoja viena kitos duomenų, duomenų migravimas gali būti tiesiog iškeliant duomenis iš vienos lentelės į mikroserviso duomenų bazę. Šio darbo metu duomenų migravimas nebuvo atliktas.
 
 \subsubsection{Ekspertų vertinimas}
-Vertinant „Mono2Micro“ buvo pasitelkti trys vyresnieji Java programuotojai, kurie atliko esamos monolitinės programos ir įrankio pasiūlytos mikroservisų architektūros lyginamąją analizę. Jų išvados atskleidė keletą vertų dėmesio „Mono2Micro“ rekomendacijų trūkumų. Visų pirma jie pastebėjo, kad „Mono2Micro“ nesiūlė įtraukti įprastų komponentų, kurie paprastai yra susiję su mikroservisų architektūra, pavyzdžiui, apkrovos balansavimo įrenginio (Load Balancer) arba API vartų (API gateway). Šie elementai, padedantys valdyti duomenų srautą ir užtikrinti veiksmingą ryšį tarp paslaugų, yra labai svarbūs patikimai ir keičiamo dydžio mikroservisų architektūrai.
+Vertinant „Mono2Micro“ buvo pasitelkti trys vyresnieji Java programuotojai, kurie atliko esamos monolitinės programos ir įrankio pasiūlytos mikroservisų architektūros lyginamąją analizę. Jų išvados atskleidė keletą vertų dėmesio „Mono2Micro“ rekomendacijų trūkumų. Visų pirma jie pastebėjo, kad „Mono2Micro“ nesiūlė įtraukti įprastų komponentų, kurie paprastai yra susiję su mikroservisų architektūra, pavyzdžiui, apkrovos balansavimo įrenginio (angl. \emph{Load Balancer}) arba API vartų (angl. \emph{API gateway}). Šie elementai, padedantys valdyti duomenų srautą ir užtikrinti veiksmingą ryšį tarp paslaugų, yra labai svarbūs patikimai ir keičiamo dydžio mikroservisų architektūrai.
 
 Be to, programuotojai pažymėjo, kad „Mono2Micro“ rekomendavo iš monolito išskirti tik vieną „payment-api“ servisą. Tačiau jie nustatė, kad šią paslaugą būtų galima toliau skaidyti į „payment-api“ ir „mail-api“ mikroservisus. Šis pastebėjimas buvo pagrįstas prielaida, kad ateityje „mail-api“ funkcijos greičiausiai išsiplės, todėl bus reikalingas atskiras mikroservisas. Dėl to kyla klausimų dėl priemonės gebėjimo numatyti būsimą įvairių funkcinių sričių augimą ir jos gebėjimo pateikti optimaliai detalizuotas rekomendacijas dėl mikroservisų architektūros.
 
@@ -279,13 +279,12 @@ Siekiant empiriškai įvertinti „Mono2Micro“ patikimumą, buvo atliktas eksp
 Nors šis eksperimentas neparodo, ar įrankis visada tiksliai sugeneruoja mikroservisų rekomendacijas, jis parodo, jog net ir varomas dirbtiniu intelektu šis įrankis sugeba sugeneruoti vienodą rezultatą. Eksperimentas parodo, jog įrankis yra deterministinis.
 
 \subsection{Rezultatų pagrįstumas}
-Siekdami veiksmingai įvertinti „Mono2Micro“ pagrįstumą, vertinimas buve vykdomas atsižvelgiant į įgyvendinimo sėkmės rodiklį. Įgyvendinimo sėkmės rodiklis parodo, koks skaičius rekomenduotų mikroservisų, kai jie yra sudiegti, be sutrikimų atlieka numatytas funkcijas ir gal net pagerina bendrą sistemos funkcionalumą, procentinę dalį.
+Siekdami veiksmingai įvertinti „Mono2Micro“ pagrįstumą, vertinimas buvo vykdomas atsižvelgiant į įgyvendinimo sėkmės rodiklį. Įgyvendinimo sėkmės rodiklis parodo, koks skaičius rekomenduotų mikroservisų, kai jie yra sudiegti, be sutrikimų atlieka numatytas funkcijas ir gal net pagerina bendrą sistemos funkcionalumą, procentinę dalį.
 
-Atliekant vertinimą buvo išbandyti pagrindiniai panaudos atvejai, įskaitant autentifikavimą ir naudotojo kūrimą, produkto elementų kūrimą, paiešką, filtravimą ir pašalinimą ir mokėjimo užbaigimą ir el. pašto siuntimą. Šie bandymai buvo atlikti naudojant „JMeter“ - žinomą programą, sukurtą tikrinti programų našumui. Rezultatai parodė, kad naujai sukurtoje mikroservisų architektūroje visi testavimo atvejai sėkmingai atlikti. Pažymėtina, kad, palyginti su monolitine sistema, buvo tikėtinas vėlavimo padidėjimas, kuris yra įprastas reiškinys dėl papildomų tinklo apkrovų mikroservisų architektūroje. Taigi galime teigti, jog įgyvendinimo sėkmės rodiklis yra 100 \%, nes visi panaudos atvejau vis dar buvo sėkmingai įvykdyti.
-
+Atliekant vertinimą buvo išbandyti pagrindiniai panaudos atvejai, įskaitant autentifikavimą ir naudotojo kūrimą, produkto elementų kūrimą, paiešką, filtravimą ir pašalinimą ir mokėjimo užbaigimą ir el. pašto siuntimą. Šie bandymai buvo atlikti naudojant „JMeter“ - žinomą programą, sukurtą testuoti programų našumui. Rezultatai parodė, kad naujai sukurtoje mikroservisų architektūroje visi testavimo atvejai sėkmingai atlikti, t.y. grąžino 2xx atsakymo kodą (angl. \emph{response code}). Pažymėtina, kad, palyginus su monolitine sistema, buvo tikėtinas vėlavimo padidėjimas, kuris yra įprastas reiškinys dėl papildomų tinklo apkrovų mikroservisų architektūroje ( žr. priedą \ref{img:latency}). Taigi galime teigti, jog įgyvendinimo sėkmės rodiklis yra 100 \%, nes visi panaudos atvejai vis dar buvo sėkmingai įvykdyti.
 
 \subsection{Įrankio panaudojamumo vertinimas}
-Šio įrankio panaudojamumui vertinti nebus naudojami įprasti vertinimo metodai, nes tai bus tik autoriaus nuomonė, kuri gali neatspindėti kitų „Mono2Micro“ naudotojų nuomonės. Kadangi autorius anksčiau nebuvo dirbęs su šiuo įrankiu, vertinimas yra laikomas nešališku. Bus vertinami šie panaudojamumo elementai: terminalo vartotojo sąsaja, interaktyvi aplinka, dokumentacija. Šitie elementai buvo pasirinkti dėl to, nes jie yra pagrindiniai elementai, norint sėkmingai dirbti su šituo įrankiu. Šių elementų didelis panaudojamumo matas reikštų, jog pats įrankis turi aukštą panaudojamumą. Kiekvienas šių elementų bus vertinamas skalėje 1-5, kur 1 - visiškai nesuprantama vartotojo sąsaja, o 5 - visiškai aiški ir suprantama sąsaja.
+Šio įrankio panaudojamumui vertinti nebus naudojami įprasti vertinimo metodai, nes tai bus tik autoriaus nuomonė, kuri gali neatspindėti kitų „Mono2Micro“ naudotojų nuomonės. Kadangi autorius anksčiau nebuvo dirbęs su šiuo įrankiu, vertinimas yra laikomas nešališku. Bus vertinami šie panaudojamumo elementai: terminalo vartotojo sąsaja, interaktyvi aplinka ir dokumentacija. Šitie elementai buvo pasirinkti dėl to, nes jie yra pagrindiniai elementai, norint sėkmingai dirbti su šituo įrankiu. Šių elementų didelis panaudojamumo matas reikštų, jog pats įrankis turi aukštą panaudojamumą. Kiekvienas šių elementų bus vertinamas skalėje 1-5, kur 1 - visiškai nesuprantama vartotojo sąsaja, o 5 - visiškai aiški ir suprantama sąsaja.
 
 \subsubsection{Terminalo vartotojo sąsaja}
 Pagrindinės „Mono2Micro“ komandos veikai terminale. kadangi tai yra patys svarbiausi šio įrankio žingsniai, geras terminalo sąsajos panaudojamumas yra itin svarbus. Kiekvienai komandai buvo suteikta pagalbos funkcija \verb| --help|. Ši komanda detaliau aprašo priimtinus komandos argumentus, paaiškina jų reikšmę, nurodo kurie elementai yra būtini, o kurie ne. Komandų nėra daug ir jas galima labai greitai išmokti, o jei pritrūksta kurių nors detalių, kurių nesuteikia pagalbos komanda, galima pasiremti dokumentacija.
@@ -297,7 +296,7 @@ Vertinimas -- \textbf{3}.
 \subsubsection{Interaktyvi aplinka}
 Interaktyvioje aplinkoje galima peržiūrėti rekomenduojamų mikroservisų grafą. Šis grafas labai aiškiai nurodo, kurios klasės gali priklausyti kokiam mikroservisui. Interaktyvioje aplinkoje galima peržiūrėti rekomenduojamus mikroservisus pagal panaudos atvejus, arba pagal natūralių gijų panašumą -- priklausomai nuo naudotojo poreikių. Taip pat yra galimybė sukurti savo mikroservisų rekomendacijas naudojantis esamomis klasėmis. Aplinka yra minimalistinė, nėra nereikalingos informacijos, yra susipažinimo su aplinka funkcija. Išmokti ja naudotis nėra sudėtinga.
 
-Interaktyvi aplinka nesuteikia galimybės išimti klasės iš rekomenduojamų mikroservisų. Didelėse sistemose, klasių gali būti labai daug, ir kai kurių elementų panaikinimas iš darbo lauko labai supaprastina visos architektūros suvokimą. Jei yra poreikis panaikinti tam tikras klases, tai galim atlikti tik redaguojant grafo \verb|.json| failą.
+Interaktyvi aplinka nesuteikia galimybės išimti klasės iš rekomenduojamų mikroservisų. Didelėse sistemose, klasių gali būti labai daug, ir kai kurių elementų panaikinimas iš darbo lauko labai supaprastina visos architektūros suvokimą. Jei yra poreikis panaikinti tam tikras klases, tai galima atlikti tik redaguojant grafo \verb|.json| failą.
 
 Vertinimas -- \textbf{4}.
 
@@ -309,9 +308,9 @@ Dokumentacijoje nėra aprašoma, kaip reikia elgtis tam tikrų klaidų atveju. J
 Vertinimas -- \textbf{3}.
 
 \subsection{Rezultatai}
-Eksperimentų metu pasiekti rezultatai yra pavaizduoti \ref{table:rezultatai} lentelėje. Remdamiesi „Mono2Micro“ vertinimo rezultatais, galime daryti išvadas, kad „Mono2Micro“ pasižymi dideliu našumu ir perspektyviu naudingumu migravimo procese. Rekomendacijų tikslumas siekia 75 \%, o tai rodo, kad nors priemonės pasiūlymai iš esmės atitinka ekspertų nuomonę, yra tokių atvejų, kai žmogiškosios žinios gali suteikti daugiau įžvalgų ar patobulinimų. Tai rodo, kad priemonė yra vertinga pagalba, nors ir nepakeičia ekspertų būtinumo. „Sėkmingo vykdymo rodiklis“ ir „Sėkmingo įgyvendinimo rodiklis“ siekia 100 \%, o tai rodo, kad įrankis geba generuoti rezultatus be klaidų ir kad jo rekomenduojamos mikroservisai sėkmingai veikia. Tai tvirtas „Mono2Micro“ veikimo patikimumo ir rekomendacijų veiksmingumo įrodymas. Apibendrinant galima teigti, jog šis įrankis sugeba kokybiškai atlikti monolitinės programos migravimą.
+Eksperimentų metu pasiekti rezultatai yra pavaizduoti \ref{table:rezultatai} lentelėje. Remdamiesi „Mono2Micro“ vertinimo rezultatais, galima daryti išvadas, kad „Mono2Micro“ pasižymi dideliu našumu ir perspektyviu naudingumu migravimo procese. Rekomendacijų tikslumas siekia 75 \%, o tai rodo, kad nors priemonės pasiūlymai iš esmės atitinka ekspertų nuomonę, yra tokių atvejų, kai žmogiškosios žinios gali suteikti daugiau įžvalgų ar patobulinimų. Tai rodo, kad priemonė yra vertinga pagalba, nors ir nepakeičia ekspertų būtinumo. „Sėkmingo vykdymo rodiklis“ ir „Sėkmingo įgyvendinimo rodiklis“ siekia 100 \%, o tai rodo, kad įrankis geba generuoti rezultatus be klaidų ir kad jo rekomenduojamos mikroservisai sėkmingai veikia. Tai tvirtas „Mono2Micro“ veikimo patikimumo ir rekomendacijų veiksmingumo įrodymas. Apibendrinant galima teigti, jog šis įrankis sugeba kokybiškai atlikti monolitinės programos migravimą.
 
-Įrankio panaudojamumo požiūriu „Mono2Micro“ galima gerinti, ypač terminalo sąsają ir dokumentaciją, kurios abi įvertintos 3 balais iš 5. Šių sričių patobulinimai galėtų pagerinti naudotojo patirtį ir palengvinti su šia priemone susijusį mokymosi procesą. Interaktyvioji aplinka, įvertinta 4 balais iš 5, yra ypač gerai įvertinta, o tai rodo, kad ji yra veiksminga ir patogi naudoti. Atsižvelgiant į šiuos įvertinimus, akivaizdu, kad nors „Mono2Micro“ gerai atlieka savo funkcijas, į naudotojų atsiliepimus reikėtų atsižvelgti nuolat tobulinant jo vartotojo sąsają ir dokumentaciją.
+Įrankio panaudojamumo požiūriu „Mono2Micro“ galima gerinti, ypač terminalo sąsają ir dokumentaciją, kurios abi įvertintos 3 balais iš 5. Šių sričių patobulinimai galėtų pagerinti naudotojo patirtį ir palengvinti su šia priemone susijusį mokymosi procesą. Interaktyvioji aplinka, įvertinta 4 balais iš 5, yra ypač gerai įvertinta, o tai rodo, kad ji yra veiksminga ir patogi naudoti. Atsižvelgiant į šiuos įvertinimus, akivaizdu, kad nors „Mono2Micro“ gerai atlieka savo funkcijas, į naudotojų atsiliepimus reikėtų atsižvelgti nuolat tobulinant jo vartotojo sąsają ir dokumentaciją, skiriant daugiau dėmesio klaidų taisymams ir aprašymams.
 
 \begin{table}[!ht]
     \centering
@@ -332,7 +331,7 @@ Eksperimentų metu pasiekti rezultatai yra pavaizduoti \ref{table:rezultatai} le
 \end{table}
 
 \subsection{Patarimai ir rekomendacijos} % o gal \section{} ?
-Naudojantis „Mono2Micro“ viskas buvo remiamasi oficialia šio įrankio dokumentacija. Ji yra viešai prieinama ir aprašo visą procesą, nuo „Mono2Micro“ diegimo iki naujų mikroservisų diegimo IBM aplinkoje. Tačiau dokumentacijoje buvo aprašyti tik laimingo srauto (happy flow) scenarijai. Jei naudojimosi įrankiu metu atsiranda klaidos, tai jos dokumentacijoje nėra indikuojamos, o pats klaidų formatas yra labai neinformatyvus - tai įprastai yra tik Python kalbos klaidos pranešimai (stack trace). Susisiekti su IBM pagalbos linija taip pat yra itin sudėtinga. Kadangi tai yra tarptautinė įmonė, IBM normalizuoja savo pagalbos linijos procesą, kuris yra ilgai trunkantis ir dažnu atveju skiriamas tik įmonėms, o ne individualiems asmenims.
+Naudojantis „Mono2Micro“ viskas buvo remiamasi oficialia šio įrankio dokumentacija. Ji yra viešai prieinama ir aprašo visą procesą, nuo „Mono2Micro“ diegimo iki naujų mikroservisų diegimo IBM aplinkoje. Tačiau dokumentacijoje buvo aprašyti tik laimingo srauto (angl. \emph{happy flow}) scenarijai. Jei naudojimosi įrankiu metu atsiranda klaidos, tai jos dokumentacijoje nėra indikuojamos, o pats klaidų formatas yra labai neinformatyvus - tai įprastai yra tik Python kalbos klaidos pranešimai (angl. \emph{stack trace}). Susisiekti su IBM pagalbos linija taip pat yra itin sudėtinga. Kadangi tai yra tarptautinė įmonė, IBM normalizuoja savo pagalbos linijos procesą, kuris yra ilgai trunkantis ir dažnu atveju skiriamas tik įmonėms, o ne individualiems asmenims.
 
 Darbo metu buvo nustatyti šie bendri pastebėjimai, kurie nėra paminėti dokumentacijoje, tačiau, autoriaus nuomone, jie yra labai svarbūs ir privalo būti paminėti:
 \begin{itemize}
@@ -342,30 +341,32 @@ Darbo metu buvo nustatyti šie bendri pastebėjimai, kurie nėra paminėti dokum
 
     \item \textbf{Nėra galimybės redaguoti galutinio rekomendacijų grafo}. „Mono2Micro“ interaktyvi aplinka suteikia galimybę priskirti klases kitiems mikroservisams, tačiau nesuteikia galimybės ištrinti tam tikras klases iš šio grafo. Ši problema siejasi su antru punktu iš šio sąrašo. Jei galutiniame rekomendacijų grafe yra daug šiukšlinės informacijos, tai kenkia bendro vaizdo matymui vartotojui. Jei vartotojas nori panaikinti klases iš grafo, tai jis to negali atlikti interaktyvioje aplinkoje. Tai galima atlikti tik redaguojant grafo \verb|.json| failą. Tačiau kai yra daug klasių ir ryšių, klasių naikinimus reikia atlikti visoms klasėms. Kad šis darbas būtų atliktas, dar yra privaloma suprasti grafo failo struktūrą, kad rankomis redaguojamas grafas vėliau nebūtų sugadintas. Šio darbo autoriaus rekomendacija yra stengtis įtraukti kuo mažiau bibliotekų statinės analizės fazėje (\verb|mono2micro analyze|).
 
-    \item \textbf{Geras monolitinės programos padengimas integraciniais testais pagreitina migravimo laiką}. Dokumentacijoje nėra paminėta, tačiau panaudos atvejų fiksavimą (\verb|mono2micro usecase|) galima atlikti ne tik rankiniu būdu atliekant visus panaudos atvejui būdingus veiksmus, bet ir pasinaudojant egzistuojančiais testais, kurie padengia tą panaudos atvejį. Svarbiausia yra nepamiršti, jog nesvarbu ar panaudos atvejai yra fiksuojami rankiniu būdu, ar pasinaudojant testais, visų metodų įėjimo, išėjimo bei kvietimo informacija privalo būti rašoma į žurnalą pasinaudojant IBM suteiktu dvejetainio instrumentavimo agentu „Minerva“, kuris atlieka visų metodų fiksavimą ir užrašo kvietimus į žurnalą.
+    \item \textbf{Geras monolitinės programos padengimas integraciniais testais pagreitina migravimo laiką}. Dokumentacijoje nėra paminėta, tačiau panaudos atvejų fiksavimą (\verb|mono2micro usecase|) galima atlikti ne tik rankiniu būdu atliekant visus panaudos atvejui būdingus veiksmus, bet ir pasinaudojant egzistuojančiais testais, kurie padengia tą panaudos atvejį. Svarbiausia yra nepamiršti, jog nesvarbu ar panaudos atvejai yra fiksuojami rankiniu būdu, ar pasinaudojant testais, visų metodų įėjimo, išėjimo bei kvietimo informacija privalo būti rašoma į žurnalą pasinaudojant IBM suteiktu dvejetainio instrumentavimo agentu \emph{„Minerva“}, kuris atlieka visų metodų fiksavimą ir užrašo jų kvietimus, kartu su laiko žyma, į žurnalą.
 
-    \item \textbf{Įrankio sugeneruotas mikroservisų kodas nėra visur pritaikomas}. Dokumentacijoje yra minama, jog „Mono2Micro“ yra skirtas IBM Websphere Liberty serveriuose veikiančioms sistemoms, tačiau nepamini, jog sugeneruotas mikroservisų kodas naudoja IBM bibliotekas, kurių negalima atrasti bendroje Maven repozitorijoje.
+    \item \textbf{Įrankio sugeneruotas mikroservisų kodas nėra visur pritaikomas}. Dokumentacijoje yra minama, jog „Mono2Micro“ yra skirtas IBM Websphere Liberty serveriuose veikiančioms sistemoms, tačiau nepamini, jog sugeneruotas mikroservisų kodas naudoja IBM bibliotekas, kurių negalima atrasti bendroje \emph{„Maven“} repozitorijoje. Taip pat sugeneruotas kodas nėra optimizuotas. Visur, kur tarp mikroservisų yra ryšys tarp dviejų klasių, nesvarbu ar tai serviso ar repozitorijos klasė, yra sugeneruojamas HTTP kvietimo kodas, o tai dažnose vietose yra nelogiška ir neatitinka gerųjų programų projektavimo praktikų.
+
+    \item \textbf{Įrankio sugeneruotas kodas yra nepadengtas testais}. Net jei monolitinė programa turi didelį padengimą testais, sugeneruotas kodas testų nemigruoja, tai yra privaloma visus testus rankiniu būdu perrašyti naujoje architektūroje.
 \end{itemize}
 
-
 \sectionnonum{Rezultatai}
-Šio rašto darbo metu pasiekti rezultatai:
+Šio darbo metu pasiekti rezultatai:
 \begin{itemize}
     \item Išanalizuota monolitinė sistema „E Shop“: aprašyti esantys moduliai, panaudos atvejai, dydis, padengimo testais dydis, duomenų struktūra ir klasių ryšiai.
 
-    \item Aprašytas monolitinės programos migravimo procesas naudojantis „Mono2Micro“ įrankiu ir sėkmingai atlikta monolitinės programos migracija į mikroservisų architektūrą.
+    \item Atlikus sistemos analizę, naudojant „Mono2Micro“ įrankį buvo pradėtas „E Shop“ programos migravimas. Procedūra, apimanti visus etapus nuo pradinio planavimo iki sėkmingo užbaigimo, buvo kruopščiai dokumentuojama. Šis įrašas suteikia vertingų įžvalgų ir pakartojamą veiksmų planą būsimiems perkėlimo procesams, taip išplečiant tyrimo poveikį už šios programos ribų.
 
-    \item Buvo atlikti eksperimentai, kurie parodo „Mono2Micro“ kokybę ir naudą programų migravime.
+    \item Buvo atlikti suplanuoti eksperimentai, kuriais siekta įvertinti „Mono2Micro“ kokybę ir naudingumą migruojant monolitinę programą. Testavimo scenarijų įvairovė leido nuodugniai ištirti įrankio galimybes įvairiomis sąlygomis, todėl buvo galima patikimai įvertinti jo funkcionalumą ir patikimą veikimą.
 
     \item Iš atliktų eksperimentų buvo nustatytos išvados, kurios įrodo „Mono2Micro“ veiksmingumą.
 
     \item Surinktos ir aprašytos pastabos bei patarimai apie įrankio panaudojamumą būsimiems šio įrankio naudotojams.
     
+    
 \end{itemize}
 
 \sectionnonum{Išvados}
 \begin{itemize}
-    \item „Mono2Micro“ veikia su Java kalba parašytomis programomis ir gali monolitinės programos analizę atlikti su Spring Boot karkasu.
+    \item „Mono2Micro“ veikia su Java kalba parašytomis programomis ir gali monolitinės programos migravimą atlikti su Spring Boot karkasu.
 
     \item „Mono2Micro“ pademonstravo aukštą patikimumo laipsnį. Įrankis sugeba sugeneruoti mikroservisų rekomendacijas ir tai atlikti be nenumatytų klaidų, tačiau yra privaloma atlikti daug paruošiamųjų darbų.
 
@@ -377,12 +378,13 @@ Darbo metu buvo nustatyti šie bendri pastebėjimai, kurie nėra paminėti dokum
 
     \item Nors „Mono2Micro“ yra įrankis skirtas mikroservisų architektūros pagrindams suteikti, šis įrankis nepateikia rekomendacijų susijusių su įprastais mikroservisų architektūros aspektais, kaip krūvio skirstytojas, ar pačių duomenų migravimas.
 
-\end{itemize}
+    \item Būsimi „Mono2Micro“ tyrimai turėtų labiau akcentuoti įrankio panaudojamumą su didesniu kiekiu skirtingų monolitinių programų.
 
+\end{itemize}
 
 \printbibliography[heading=bibintoc]
 
-% \appendix  % Priedai
+\appendix  % Priedai
 % % Prieduose gali būti pateikiama pagalbinė, ypač darbo autoriaus savarankiškai
 % % parengta, medžiaga. Savarankiški priedai gali būti pateikiami ir
 % % kompaktiniame diske. Priedai taip pat numeruojami ir vadinami. Darbo tekstas
@@ -395,5 +397,13 @@ Darbo metu buvo nustatyti šie bendri pastebėjimai, kurie nėra paminėti dokum
 %     \caption{Paveikslėlio pavyzdys}
 %     \label{img:mlp}
 % \end{figure}
+
+\section{Monolitinės ir mikroservisų architektūros HTTP kvietimų srautų palyginimas}
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.6]{img/latency.png}
+    \caption{Monolitinės ir mikroservisų architektūros HTTP kvietimų srautų palyginimas}
+    \label{img:latency}
+\end{figure}
 
 \end{document}
