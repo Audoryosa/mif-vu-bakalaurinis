@@ -37,20 +37,19 @@
 \maketitle
 
 \sectionnonumnocontent{Santrauka}
-Sparčiai diegiant mikroservisų architektūrą reikia veiksmingų priemonių, kurios padėtų pereiti nuo monolitinių sistemų. IBM „Mono2Micro“ yra vienas iš tokių įrankių, skirtų šiam migravimo procesui automatizuoti ir palengvinti. Tačiau reikia sistemingai įvertinti jos patikimumą ir pagrįstumą, kad būtų užtikrintas jos veiksmingumas realiomis sąlygomis. Šio darbo tikslas - atlikti išsamų „Mono2Micro“ vertinimą naudojant patikimų ir kiekybiškai įvertinamų rodiklių rinkinį. Vertinimas sutelktas į „Rekomendacijų tikslumą“, „Sėkmingo įgyvendinimo lygį“ ir „Įgyvendinimo sėkmės lygį“ kriterijus. Nors šio darbo rezultatai rodo didelį „Mono2Micro“ patikimumą ir pagrįstumą bandomuose scenarijuose, jie taip pat pabrėžia, kad kartu su automatizuotomis priemonėmis reikia žmogiškosios kompetencijos ir strateginio numatymo. Ateityje būtų galima išbandyti „Mono2Micro“ su įvairesnėmis monolitinėmis taikomosiomis programomis ir palyginti jo veikimą su kitais migravimo įrankiais. Šis tyrimas prisideda prie „Mono2Micro“ veiksmingumo supratimo ir pateikia įžvalgų, kuriomis būtų galima vadovautis taikant šią priemonę ateityje.
+Sparčiai diegiant mikroservisų architektūrą reikia veiksmingų priemonių, kurios padėtų pereiti nuo monolitinių sistemų. IBM „Mono2Micro“ yra vienas iš įrankių, skirtų šiam migravimo procesui automatizuoti ir palengvinti. Tačiau reikia sistemingai įvertinti jos patikimumą ir pagrįstumą, kad būtų užtikrintas jos veiksmingumas realiomis sąlygomis. Šio darbo tikslas - atlikti išsamų „Mono2Micro“ vertinimą naudojant patikimų ir kiekybiškai įvertinamų rodiklių rinkinį. Vertinimas sutelktas į „Rekomendacijų tikslumą“, „Sėkmingo įgyvendinimo lygį“ ir „Įgyvendinimo sėkmės lygį“ kriterijus. Nors šio darbo rezultatai rodo didelį „Mono2Micro“ patikimumą ir pagrįstumą bandomuose scenarijuose, jie taip pat pabrėžia, kad kartu su automatizuotomis priemonėmis reikia žmogiškosios kompetencijos ir strateginio numatymo. Ateityje būtų galima išbandyti „Mono2Micro“ su įvairesnėmis monolitinėmis taikomosiomis programomis ir palyginti jo veikimą su kitais migravimo įrankiais. Šis tyrimas prisideda prie „Mono2Micro“ veiksmingumo supratimo ir pateikia įžvalgų, kuriomis būtų galima vadovautis taikant šią priemonę ateityje.
 \raktiniaizodziai{„Mono2Micro“, Mikroservisų architektūra, Monolitinė architektūra, Programų sistemų pertvarkymas, Programų sistemų patikimumas, Programų sistemų pagrįstumas}
 
 \sectionnonumnocontent{Summary}
 The rapid deployment of microservices architectures requires effective tools to move away from monolithic systems. IBM's Mono2Micro is one such tool designed to automate and facilitate this migration process. However, its reliability and validity need to be systematically evaluated to ensure its effectiveness in real-life conditions. The aim of this work is to carry out a comprehensive evaluation of Mono2Micro using a set of reliable and quantifiable indicators. The evaluation focuses on the criteria of "Accuracy of recommendations", "Level of successful implementation" and "Level of implementation success". While the results of this work show the high reliability and validity of Mono2Micro in the scenarios tested, they also highlight the need for human expertise and strategic foresight in combination with automated tools. Future work could test Mono2Micro with a wider range of monolithic applications and compare its performance with other migration tools. This study contributes to the understanding of the effectiveness of Mono2Micro and provides insights to guide future applications of the tool.
 \keywords{Mono2Micro, Microservices, Monolithic Systems, Software Refactoring, Software Reliability, Software Validity}
 
-
 \tableofcontents
 
 \sectionnonum{Įvadas}
-Kai komanda pradeda kurti programą, monolitas įprastai yra numatytas pasirinkimas. Tai yra viena pagrindinių priežasčių, kodėl egzistuoja itin daug monolitinių sistemų. Monolitas turi savo duomenų bazę, savo funkcionalumo įgyvendinimą ir tai yra vientisa programa. Jis yra lengvai suprogramuojamas ir su palyginamai nedideliu darbo indėliu, galima greitai sukurti bei diegti veikiančią sistemą. Tačiau tokią architektūrą yra labai sunku plėtoti bei palaikyti. Kuo daugiau  tokia sistema yra plėtojama, tuo daugiau ji didėja, daugėja kodo bei priklausomybių nuo kitų sistemų. Diegimai tampa ilgi ir itin reti. Testavimas būna sudėtingas, nes negalima atlikti izoliuoto atskirų sistemos modulių testavimo. Kad ši problema būtų išspręsta, paprastai monolitinės sistemos yra skaidomos į mikroservisus.
+Kai komanda pradeda kurti programą, monolitas įprastai yra numatytas pasirinkimas. Tai yra viena pagrindinių priežasčių, kodėl egzistuoja itin daug monolitinių sistemų. Monolitas turi savo duomenų bazę, savo funkcionalumo įgyvendinimą ir tai yra vientisa programa. Jis yra lengvai suprogramuojamas ir su palyginamai nedideliu darbo indėliu, galima greitai sukurti bei diegti veikiančią sistemą. Tačiau tokią architektūrą yra labai sunku plėtoti bei palaikyti. Kuo daugiau  tokia sistema yra plėtojama, tuo daugiau ji didėja, daugėja kodo bei priklausomybių nuo kitų sistemų. Anot S. Newman, mikroservisų architektūros specialisto, tuomet diegimai tampa ilgi ir itin reti. Testavimas būna sudėtingas, nes negalima atlikti izoliuoto atskirų sistemos modulių testavimo \cite{New19}. Kad ši problema būtų išspręsta, paprastai monolitinės sistemos yra skaidomos į mikroservisus \cite{DK}.
 
-Mikroservisai – tai atskiri, nedideli servisai, kurie atsakingi už tam tikras specifines užduotis. Jie yra implementuoti kaip atskiros programos, o komunikacija tarp jų įprastai yra vykdoma per pranešimų siuntimo (angl. messaging) technologijas arba per REST API. Kiekvienas mikroservisas turi savo duomenų bazę, savo diegimo strategijas bei testavimo aplinką. Mikroservisų architektūra suteikia daug privalumų, pavyzdžiui:
+Mikroservisai – tai atskiri, nedideli servisai, kurie atsakingi už tam tikras specifines užduotis. Jie yra implementuoti kaip atskiros programos, o komunikacija tarp jų įprastai yra vykdoma per pranešimų siuntimo (angl. messaging) technologijas arba per REST API. Kiekvienas mikroservisas turi savo duomenų bazę, savo diegimo strategijas bei testavimo aplinką. Mikroservisų architektūra suteikia daug privalumų \cite{FBZ+19}, pavyzdžiui:
 \begin{itemize}
     \item Pagreitinami sistemos diegimai.
     \item Pagerinamas sistemos plečiamumas.
@@ -70,7 +69,7 @@ Darbo tikslas: įvertinti „Mono2Micro“ techninės galimybės bei pateikti re
 Šio darbo uždaviniai bus trys: darbe bus atlikta problemos analizė, bus atliktas eksperimentas, kurio tikslas bus įvertinti įrankio savybes, ir pagal eksperimento rezultatus atlikti įrankio vertinimą. Tyrimo tikslams pasiekti bus atliekamos kelios užduotys. Pirma, bus analizuojama monolitinė programa, siekiant nustatyti jos pagrindines funkcijas ir priklausomybes. Antra, bus naudojamas įrankis „Mono2Micro“, kad monolitinė programa būtų migruota į mikroservisų architektūrą, remiantis domenais grindžiamo projektavimo principais. Trečia, bus atliktas eksperimentas, kurio siekis bus įvertinti įrankio kokybiškumą atsižvelgiant į gerąsias mikroservisų architektūros praktikas. Atlikus šias užduotis bus padaryta išvada, ar „Mono2Micro“ yra tinkamas įrankis monolitinių sistemų migravimo į mikroservisų architektūrą užduočiai.
 
 \section{Dekomponavimas skaidant domenus}
-Pirmiausia aptarsime vieną iš populiariausių migravimo strategijų – skaidymas pagal domenus \cite{Wal22}. Šią strategiją verta naudoti tuomet, kai verslo panaudos sritys yra aiškiai išskirtos. Dažnai  ši sąlyga būna neįgyvendinta, todėl yra itin svarbu į monolito pertvarkymo procesą įtraukti verslo atstovus, analitikus bei kitus techninius sistemos atstovus, kurie gerai supranta perdaromos sistemos funkcionalumą esančiame įgyvendinime.
+Pirmiausia bus aptarta vieną iš populiariausių migravimo strategijų – skaidymas pagal domenus \cite{Wal22}. Šią strategiją verta naudoti tuomet, kai verslo panaudos sritys yra aiškiai išskirtos. Dažnai  ši sąlyga būna neįgyvendinta, todėl yra itin svarbu į monolito pertvarkymo procesą įtraukti verslo atstovus, analitikus bei kitus techninius sistemos atstovus, kurie gerai supranta perdaromos sistemos funkcionalumą esančiame įgyvendinime.
 
 \subsection{Strategijos aprašymas}
 Dekomponavimas skaidant domenus (angl. domain-driven refactoring) yra viena iš populiariausių migravimo strategijų. Ją geriausia naudoti tuomet, kai monolitas buvo kurtas laikantis domenais paremtu kūrimu (angl. domain-driven development). Tačiau ne visada būna taip, jog monolitas yra jau iš karto paruoštas migravimui. Pirmas ir svarbiausias žingsnis yra esminių domenų identifikavimas \cite{LZ22}. Kad esminių domenų identifikavimas būtų atliktas sėkmingai, privaloma įtraukti visus suinteresuotuosius asmenis minėtus anksčiau. Kad nauja architektūra tinkamai atliktų užduotis, privaloma investuoti laiko į monolito servisų sėkmingą migravimą į atskirus servisus. 
@@ -113,7 +112,7 @@ Taigi, šią migravimo strategiją rekomenduojama naudoti tuomet, kai yra aiški
 Per pastaruosius metus šis metodas pritraukė daug dėmesio. Jo pagalba galima palengvintu būdu atskirti esminius domenus bei juos iškelti į naujus mikroservisus. Naudojantis šiuo įrankiu klaidų tikimybė yra tikėtinai mažesnė, monolito migravimas tampa greitesnis už tradicinius metodus bei turi galimybę paruošti naujus mikroservisus būti naudojamiems debesijoje (angl. cloud computing). Šio darbo rašymo metu, įrankis sėkmingai atlieka migravimo užduotis tik su Java kalba parašytoms programoms, tačiau ateityje yra numatoma apjungti ir kito tipo programas \cite{KXL+20}.
 
 \subsection{Strategijos aprašymas}
-„Mono2Micro“ (toliau įrankis) yra dirbtinio intelekto pagalba sukurtas įrankių rinkinys, kuris padeda pertvarkyti esamą seną sistemą į mikroservisų architektūrą. Įrankis leidžia vartotojui pasirinkti norimus panaudos atvejus ir veikimo metu juos priskirti esančioms klasėms, servisams. Įrankis taip pat atlieka statinę programos analizę ir surenka programos struktūrinę informaciją bei priklausomybes. Šią informaciją tuomet analizuoja dirbtinio intelekto variklis ir sukuria programos padalinius (angl. partitions) pagal verslo panaudos atvejų ir priklausomybių panašumą bei panaudojimą. Sugeneruoti padaliniai yra potencialūs kandidatai naujam mikroservisui. Vartotojas gali peržiūrėti šiuos padalinius, juos redaguoti ar kitaip grupuoti, kad būtų gautas kuo tikslesnis norimas mikroservisas \cite{KXK+21}. Taip pat, kartu su verslo panaudos atvejais, įrankis sugeneruoja natūraliai panašius padalinius. Jie skiriasi tuo, jog nėra analizuojama duomenų priklausomybė. Taip galima supaprastinti duomenų priklausomybes tarp sugeneruotų padalinių.
+„Mono2Micro“ (toliau įrankis) yra dirbtinio intelekto pagalba sukurtas įrankių rinkinys, kuris padeda pertvarkyti esamą seną sistemą į mikroservisų architektūrą. Įrankis leidžia vartotojui pasirinkti norimus panaudos atvejus ir programos veikimo metu juos priskirti esančioms klasėms, servisams. Įrankis taip pat atlieka statinę programos analizę ir surenka programos struktūrinę informaciją bei priklausomybes. Šią informaciją tuomet analizuoja dirbtinio intelekto variklis ir sukuria programos padalinius (angl. partitions) pagal verslo panaudos atvejų ir priklausomybių panašumą bei panaudojimą. Sugeneruoti padaliniai yra potencialūs kandidatai naujam mikroservisui. Vartotojas gali peržiūrėti šiuos padalinius, juos redaguoti ar kitaip grupuoti, kad būtų gautas kuo tikslesnis norimas mikroservisas \cite{KXK+21}. Taip pat, kartu su verslo panaudos atvejais, įrankis sugeneruoja natūraliai panašius padalinius. Jie skiriasi tuo, jog nėra analizuojama duomenų priklausomybė. Taip galima supaprastinti duomenų priklausomybes tarp sugeneruotų padalinių.
 
 \begin{figure}[H]
     \centering
@@ -122,7 +121,7 @@ Per pastaruosius metus šis metodas pritraukė daug dėmesio. Jo pagalba galima 
     \label{img:mono-2-micro}
 \end{figure}
 
-Kad įrankis sugeneruotų tikslius panaudos atvejus, programa kurią norima pertvarkyti yra paleidžiama. Kai ji pradeda veikti, per vartotojo sąsają būtina atlikti visus panaudos atvejus. Jei kuris nors atvejis bus praleistas, įrankis ieškos daugiau panaudos atvejų funkciniuose testuose. Visa ši informacija yra surenkama į orientuotą grafą $(V, E)$. kur $V$ yra klasės, $E$ yra veikimo metu nustatyti metodų kvietimo sąryšiai tarp klasių \cite{KXL+20}. Sugeneruoto grafo pavyzdys parodomas \ref{img:mono-micro-grafas} pav.
+Kad įrankis sugeneruotų tikslius panaudos atvejus, programa, kurią norima pertvarkyti yra startuojama. Kai ji pradeda veikti, per vartotojo sąsają būtina atlikti visus panaudos atvejus. Jei kuris nors atvejis bus praleistas, įrankis ieškos daugiau panaudos atvejų funkciniuose testuose. Visa ši informacija yra surenkama į orientuotą grafą $(V, E)$. kur $V$ yra klasės, $E$ yra veikimo metu nustatyti metodų kvietimo sąryšiai tarp klasių \cite{KXL+20}. Sugeneruoto grafo pavyzdys parodomas \ref{img:mono-micro-grafas} pav.
 
 \begin{figure}[H]
     \centering
@@ -142,7 +141,7 @@ Panašumo dydis yra apskaičiuojamas remiantis tiesioginiais ir netiesioginiais 
 Kai yra sugeneruojami padaliniai pagal panaudos atvejų panašumą, įrankis juos sujungia pagal natūralų panašumą. Jei klasės $c_{i}$ ir $c_{j}$ turi ryšių, jos yra priskiriamos vienam padaliniui. Tokiu būdu pereinama per visas visų padalinių klases ir gaunamas optimalus natūraliai panašių padalinių skaičius.
 
 \subsection{Strategijos pritaikymas}
-Šiai strategijai išbandyti naudojama populiari „IBM“ sukurta etaloninė programa „DayTrader“ \cite{IBM15}. Tai yra elektroninė akcijų pirkimo ir pardavimo programa. Ji leidžia vartotojui prisijungti, peržiūrėti savo profilį, peržiūrėti esamas akcijas, jų kainas bei kainų istoriją, pirkti bei parduoti akcijas. Joje yra 112 klasių ir 964 metodų. Kodo padengimas funkciniais testais: padengta  66 \% klasių, 44 \% metodų. Pasinaudojus įrankiu ir nurodžius padalinių skaičių $k = 7$ gauname rekomenduojamus 3 padalinius $p_{1}, p_{2}, p_{3}$.
+Šiai strategijai išbandyti buvo naudojama populiari „IBM“ sukurta etaloninė programa „DayTrader“ \cite{IBM15}. Tai yra elektroninė akcijų pirkimo ir pardavimo programa. Ji leidžia vartotojui prisijungti, peržiūrėti savo profilį, peržiūrėti esamas akcijas, jų kainas bei kainų istoriją, pirkti bei parduoti akcijas. Joje yra 112 klasių ir 964 metodų. Kodo padengimas funkciniais testais: padengta  66 \% klasių, 44 \% metodų. Pasinaudojus įrankiu ir nurodžius padalinių skaičių $k = 7$ gauname rekomenduojamus 3 padalinius $p_{1}, p_{2}, p_{3}$.
 
 \begin{figure}[H]
     \centering
@@ -157,13 +156,15 @@ Padalinyje $p_{1}$ yra priskiriamos klasės, susijusios su akcijų pirkimo ir pa
 „Mono2Micro“ tinka sugeneruoti esamo Java EE monolito pertvarkymo rekomendacijoms. Šis įrankis yra lankstus, suteikiantis daug patarimų ir rekomendacijų, ir parodė, jog veikia gerai su vidutinio dydžio Java Spring programomis \cite{San21}. Tačiau įrankis daugiau dėmesio skiria sugrupuoti esamas klases pagal jų techninį funkcionalumą, o ne pagal verslo panaudos atvejus, kas yra įprastas mikroservisų tikslas. Taip pat pastebėtina, jog šis įrankis gali būti naudojamas ne tik monolito paruošimui mikroservisų architektūrai, bet ir patikrinimui, ar monolitą tikrai verta skaldyti į atskirus mikroservisus. Jei gaunamas rekomenduotinų padalinių skaičius yra nedidelis (pvz., 2), tai verta pamąstyti, ar apsimoka skirti laiko ir resursų šiam sudėtingam darbui. Nors šis įrankis šiuo metu veikia tik su Java programomis, tikėtina, jog jis ateityje palengvins ir kitokio tipo programų pertvarkymą.
 
 \section{„Mono2Micro“ praktinis pritaikymas bei kokybės vertinimas}
-Šiame darbe bus atliekamas monolitinės sistemos „E Shop“ migravimas naudojantis „Mono2Micro“ migravimo įrankiu. Migravimo metu bus vertinamas šio įrankio patikimumas, ekseprimento rezultatų pagrįstumas bei panaudojamumas. Šio eksperimento rezultatai priklauso nuo aplinkos, kurioje jie yra vykdomi. Vykdant kontroliuojamus eksperimentus bus manipuliuojama nepriklausomais kintamaisiais. Tikėtinas šių eksperimentų rezultatas yra aukštas įrankio patikimumas bei panaudojamumas. Taip pat pastabos, patarimai ir įžvalgos, kaip šis įrankis gali būti pagerintas ar kaip juo naudotis, kad būtų pasiektas geriausias migravimo rezultatas.
+Šiame darbe bus atliekamas monolitinės sistemos „E Shop“ migravimas naudojantis „Mono2Micro“ migravimo įrankiu. Migravimo metu bus vertinamas šio įrankio patikimumas, ekseprimento rezultatų pagrįstumas bei panaudojamumas. Šio eksperimento rezultatai priklauso nuo aplinkos, kurioje jie yra vykdomi. Tikėtinas šių eksperimentų rezultatas yra aukštas įrankio patikimumas bei panaudojamumas. Taip pat pastabos, patarimai ir įžvalgos, kaip šis įrankis gali būti pagerintas ar kaip juo naudotis, kad būtų pasiektas geriausias migravimo rezultatas.
 
 Atlikus šiuos eksperimentus bus atlikta monolitinės sistemos migracija į „Mono2Micro“ parekomenduotus mikroservisus. Tada bus patikrinama, ar ši nauja sistema vis dar atlieka jai būdingus panaudos atvejus, bus lyginamas jos ir monolitinės sistemos našumas.
 
 \subsection{Pasiruošimas vertinimui}
 % nežinau, ar verta šitai paminėti
-„Mono2Micro“ yra mokamas IBM įrankis, skirtas atlikti migravimą IBM WebSphere Open Liberty serveryje, tačiau šis įrankis pateikia mikroservisų rekomendacijas nepriklausomai nuo vykdomosios aplinkos. Šio įrankio bandomąją 3 mėnesių versiją gali pasiimti bet kas, susikūręs paskyrą IBM svetainėje. Kad įrankis veiktų, privaloma savo aplinkoje būti sudiegus Docker technologiją. „Mono2Micro“ veikia terminalo aplinkoje, naudojant kelias pagrindines komandas \cite{IBMM2M}:
+„Mono2Micro“ yra mokamas IBM įrankis, skirtas atlikti migravimą IBM WebSphere Open Liberty serveryje, tačiau šis įrankis pateikia mikroservisų rekomendacijas nepriklausomai nuo vykdomosios aplinkos. Šio įrankio bandomąją 3 mėnesių versiją gali pasiimti bet kas, susikūręs paskyrą IBM svetainėje. Kad įrankis veiktų, privaloma savo aplinkoje būti sudiegus Docker technologiją. 
+
+„Mono2Micro“ veikia terminalo aplinkoje, naudojant kelias pagrindines komandas \cite{IBMM2M}:
 \begin{itemize}
     \item \verb|mono2micro analyze -a <dir-to-jar-file>| -- ši komanda atlieka statinę Java programos analizę ir sukuria pirminius duomenis, kuriuos vėliau naudos dirbtinio intelekto variklis.
 
@@ -176,7 +177,7 @@ Atlikus šiuos eksperimentus bus atlikta monolitinės sistemos migracija į „M
     \item \verb|mono2micro generate| -- ši komanda sugeneruoja atskirus mikroservisus pagal sugeneruoto grafo duomenis.
 \end{itemize}
 
-Įvykdžius šias komandas yra atliekamas pilnas monolitinės sistemos perdarymas. Kiekviena atskira komanda atlieka skirtingas užduotis, tačiau jei bent viena atlieka savo užduotį klaidingai, tai visos sekančios komandos taip pat neveiks. 
+Įvykdžius šias komandas eilės tvarka yra atliekamas pilnas monolitinės sistemos perdarymas. Kiekviena atskira komanda atlieka skirtingas užduotis, tačiau jei bent viena atlieka savo užduotį klaidingai, tai visos sekančios komandos taip pat neveiks. 
 
 \subsubsection{Įrankio patikimumo vertinimas}
 Programinės įrangos patikimumo vertinimas yra vienas būtiniausių matų, kuris nurodo programinės įrangos kokybę bei gali padėti suprasti, kiek priežiūros jai gali prireikti \cite{MarCY}. Įrankio patikimumui vertinti bus atliekamas jo rezultatų patikimumo skaičiavimo eksperimentas. Vertinant „Mono2Micro“ patikimumą yra privaloma atsižvelgti į rodiklius, kurie tiksliai atspindėtų jo našumą bei naudingumą pertvarkant monolitines Java programas į mikroservisų architektūrą. Šiame darbe bus naudojami 2 rodikliai:
@@ -184,7 +185,7 @@ Programinės įrangos patikimumo vertinimas yra vienas būtiniausių matų, kuri
     % reik kitos metrikos, mean time sounds bad
     \item Mikroservisų rekomendacijų tikslumas -- rodiklis, kuris palygina „Mono2Micro“ rezultatus su programinės įrangos kūrimo ekspertų sprendimais. Šį matą yra galima išreikšti pagal rekomendacijų, atitinkančių ekspertų sprendimus, procentinę dalį, taip nustatant aiškų, išmatuojamą patikimumo rodiklį. Laikoma, jog kuo didesnis panašumo dydis procentais, tuo įrankis parekomenduoja tikslesnius mikroservisus.
 
-    \item Sėkmingo vykdymo rodiklis -- rodiklis, kuris nurodo skaičių atvejų, kai „Mono2Micro“ nesusiduria su klaidomis ar problemomis. Didesnis rodiklis nurodo didesnį įrankio patikimumą.
+    \item Sėkmingo vykdymo rodiklis -- rodiklis, kuris nurodo skaičių atvejų, kai „Mono2Micro“ nesusiduria su klaidomis ar problemomis atliekant įprastas savo funkcijas. Didesnis rodiklis nurodo didesnį įrankio patikimumą.
     \newline 
     
     % \item MTTF (Mean Time To Failure) -- atliekamas tos pačios komandos vykdymas N kartų. Tikrinama, kas kiek atlikimų rezultatas yra klaidingas. Tikėtina, jog vykdant komandas su tais pačiais duomenimis ir parametrais, rezultatas bus vienodas ir įrankis atliks užduotis be klaidų. Šiame kontekste, klaida yra neteisingas/nelogiškas mikroservisų rekomendavimas arba įrankio neveikimas.
@@ -195,7 +196,7 @@ Programinės įrangos patikimumo vertinimas yra vienas būtiniausių matų, kuri
 
 \end{itemize}
 
-IBM „Mono2Micro“ kontekste tradiciniai patikimumo rodikliai, tokie kaip vidutinis laikas iki gedimo (MTTF) arba vidutinis laikas tarp gedimų (MTBF), nėra itin svarbūs ar taikytini. Pirmiausia todėl, kad „Mono2Micro“ nėra sistema, kuri veikia nuolat ir kuriai laikui bėgant gresia gedimo rizika, o būtent šiems rodikliams matuoti šie rodikliai ir yra skirti. Vietoj to, „Mono2Micro“ yra priemonė, kuri pateikia rekomendacijas kaip monolitinę „Java“ programą pertvarkyti į mikroservisus. Šiame kontekste „nesėkmės“ sąvoka yra kitokia ir ją tiksliau atspindi tokios metrikos kaip įrankio rekomendacijų tikslumas arba sėkmingo vykdymo be klaidų rodiklis. MTTF ir MTBF labiau tinka sistemoms, kuriose gedimai apibrėžiami kaip visiški sistemos gedimai, kuriuos reikia taisyti arba paleisti iš naujo, o tai netaikoma tokiai priemonei kaip „Mono2Micro“. Taigi, siekdami prasmingai įvertinti šios priemonės patikimumą, daugiausia dėmesio skiriame rodikliams, labiau susijusiems su konkrečiomis šios priemonės funkcijomis ir tikėtiniems rezultatais.
+IBM „Mono2Micro“ kontekste tradiciniai patikimumo rodikliai, tokie kaip vidutinis laikas iki gedimo (MTTF) arba vidutinis laikas tarp gedimų (MTBF), nėra itin svarbūs ar taikytini. Pirmiausia todėl, kad „Mono2Micro“ nėra sistema, kuri nuolat veikia ir kuriai laikui bėgant gresia gedimo rizika, o būtent šiems rodikliams matuoti šie rodikliai ir yra skirti. Vietoj to, „Mono2Micro“ yra priemonė, kuri pateikia rekomendacijas kaip monolitinę „Java“ programą pertvarkyti į mikroservisus. Šiame kontekste „nesėkmės“ sąvoka yra kitokia ir ją tiksliau atspindi tokios metrikos kaip įrankio rekomendacijų tikslumas arba sėkmingo vykdymo be klaidų rodiklis. MTTF ir MTBF labiau tinka sistemoms, kuriose gedimai apibrėžiami kaip visiški sistemos gedimai, kuriuos reikia taisyti arba paleisti iš naujo, o tai netaikoma tokiai priemonei kaip „Mono2Micro“. Taigi, siekdami prasmingai įvertinti šios priemonės patikimumą, daugiausia dėmesio skiriame rodikliams, labiau susijusiems su konkrečiomis šios priemonės funkcijomis ir tikėtiniems rezultatais.
 \subsubsection{Rezultatų pagrįstumas}
  % papasakoti daugiau apie rezultatų pagrįstumą?
 Rezultatų pagrįstumas programų sistemų inžinerijoje yra svarbus konceptas siekiant įrodyti, jog atlikti patikimumo eksperimentai tikrai įvertina programos kokybę, t.y. vertina tai, ką ir privalo vertinti \cite{LMPV}. „Mono2Micro“ kontekste, siekiant įvertinti rezultatų pagrįstumą, bus atsižvelgta į įgyvendinimo sėkmės rodiklį, t.y. rekomenduojamų mikroservisų, kurie, juos įdiegus, be sutrikimų atlieka numatytas funkcijas ir prisideda prie bendro sistemos funkcionalumo gerinimo, procentinę dalį. Ši metrika nurodys, ar naujai pertvarkyta programa vis dar teisingai atlieka savo užduotis ir ar įrankis migravimo metu nepanaikina kritinių programos dalių.
@@ -205,7 +206,27 @@ Rezultatų pagrįstumas programų sistemų inžinerijoje yra svarbus konceptas s
 % Pridet dar ka nors?
 
 \subsection{Mikroservisų rekomendacijų tikslumas}
-Šiame darbe „Mono2Micro“ bus naudojamas monolitinės sistemos „E Shop“ migravimui į mikroservisų architektūrą. Šis monolitas yra parašytas Java kalba, su Spring Boot karkasu. Šiame monolite yra 65 Java klasių failai ir 8 skirtingi REST kvietimai. Monolitas naudoja vieną duomenų bazę ir 4 lenteles. Komponentų sąsajos pavaizduotos \ref{img:e-shop-komponentai} pav. Šio monolito migravimas bus atliktas remiantis domenais grindžiamo projektavimo principais ir „Mono2Micro“ rekomendacijomis. Kadangi \verb|mono2micro generate| komanda sugeneruoja kodą, kuris yra pritaikytas IBM serveriams, mikroservisai bus sugeneruoti pasinaudojant rekomendacijų grafu ir iškeliant visas klases, kurios yra priskiriamos vienam ar kitam mikroservisui. Sugeneruotas grafas pavaizduotas \ref{img:grafas} pav. 
+Šiame darbe „Mono2Micro“ bus naudojamas monolitinės sistemos „E Shop“ migravimui į mikroservisų architektūrą. Šis monolitas yra parašytas Java kalba, su Spring Boot karkasu. Šiame monolite yra 65 Java klasių failai ir 8 skirtingi REST kvietimai. Monolitas naudoja vieną duomenų bazę ir 4 lenteles.
+
+Šios programos pagrindiniai panaudos atvejai yra vartotojų prisijungimas bei registracija, administratoriaus prisijungimas bei registracija, prekių pridėjimas, gavimas, filtravimas, išėmimas, mokėjimų inicijavimas, elektroninio laiško siuntimas.
+
+Komponentų sąsajos pavaizduotos \ref{img:e-shop-komponentai} pav. Šio monolito migravimas bus atliktas remiantis domenais grindžiamo projektavimo principais ir „Mono2Micro“ rekomendacijomis.
+
+Pirmiausia yra atliekamas pasiruošimas migravimui įvykdant šiuos žingsnius:
+\begin{enumerate}
+    \item Sukuriamas suarchyvuotas programos \emph{.jar / .war} failas. 
+
+    \item Programos failas yra statiškai analizuojamas pasinaudojant \verb|mono2micro analyze| komanda. Šios komandos rezultatas yra klasių ryšių failas. Prieš komandos vykdymą yra nurodoma, kokios bibliotekos neturėtų būti įtrauktos į migravimo kontekstą. Įprastu atveju tai yra išorinės pagalbinės bibliotekos, kurios neturi tiesioginės įtakos programos panaudos atvejų analizavimui, pavyzdžiui, duomenų bazės konfigūraciniai failai.
+
+    \item Sugeneruojamas programos žurnalo failas, kuriame yra surašyti sisteminiai kvietimai, atliekant panaudos atvejų demonstravimą.
+
+    \item Sugeneruojamas rekomendacijų \verb|.json| failas.
+
+    \item Pagal sugeneruoto grafo duomenis, atrenkamos klasės, kurios yra priskirtos vienam ar kitam mikroservisui. Iš iškeltų klasių sukuriamas Java Spring Boot mikroservisas.
+    
+\end{enumerate}
+
+Kadangi \verb|mono2micro generate| komanda sugeneruoja kodą, kuris yra pritaikytas IBM serveriams, mikroservisai yra sugeneruoti pasinaudojant rekomendacijų grafu ir iškeliant visas klases, kurios yra priskiriamos vienam ar kitam mikroservisui. Sugeneruotas grafas pavaizduotas \ref{img:grafas} pav. 
 
 \begin{figure}[H]
     \centering
@@ -232,7 +253,7 @@ Rezultatų pagrįstumas programų sistemų inžinerijoje yra svarbus konceptas s
 \end{itemize}
 
 
-Galima pastebėti, jog yra klasių, kurios nebuvo priskirtos jokiam mikroservisui. Tai yra klasės, kurios nebuvo kviečiamos ar kitaip naudojamos panaudos atvejų fiksavimo metu. Pasinaudojus šio grafo informacija, visi Java failai, priklausantys vienam mikroservisui, bus sukelti į naują mikroservisą. Jei failas yra naudojamas ir viename, ir kitame servise. vadinasi jis turi priklausyti abiem servisams. Kitaip sakant, jis bus dubliuojamas. Kiekvienas servisas turės savo duomenų bazę. Kvietimai tarp metodų bus pakeisti į REST protokolo kvietimus. Nauja architektūra, pagal „Mono2Micro“ rekomendaciją, pavaizduota \ref{img:nauja-architektura} pav. 
+Galima pastebėti, jog yra klasių, kurios nebuvo priskirtos jokiam mikroservisui. Tai yra klasės, kurios nebuvo kviečiamos ar kitaip naudojamos panaudos atvejų fiksavimo metu. Pasinaudojus šio grafo informacija, visi Java failai, priklausantys vienam mikroservisui, bus sukelti į naują mikroservisą. Jei failas yra naudojamas ir viename, ir kitame servise, vadinasi jis turi priklausyti abiem servisams. Kitaip sakant, jis bus dubliuojamas. Kiekvienas servisas turės savo duomenų bazę. Kvietimai tarp metodų bus pakeisti į REST protokolo kvietimus. Nauja architektūra, pagal „Mono2Micro“ rekomendaciją, pavaizduota \ref{img:nauja-architektura} pav. 
 
 \begin{figure}[H]
     \centering
@@ -241,12 +262,14 @@ Galima pastebėti, jog yra klasių, kurios nebuvo priskirtos jokiam mikroservisu
     \label{img:nauja-architektura}
 \end{figure}
 
+Kadangi duomenų ryšiai šioje programoje yra paprasti ir lentelės nenaudoja viena kitos duomenų, duomenų migravimas gali būti tiesiog iškeliant duomenis iš vienos lentelės į mikroserviso duomenų bazę. Šio darbo metu duomenų migravimas nebuvo atliktas.
+
 \subsubsection{Ekspertų vertinimas}
-Vertinant „Mono2Micro“ buvo pasitelkti trys vyresnieji Java programuotojai, kurie atliko esamos monolitinės programos ir įrankio pasiūlytos mikroservisų architektūros lyginamąją analizę. Jų išvados atskleidė keletą vertų dėmesio priemonės rekomendacijų trūkumų. Visų pirma jie pastebėjo, kad „Mono2Micro“ nesiūlė įtraukti įprastų komponentų, kurie paprastai yra susiję su mikroservisų architektūra, pavyzdžiui, apkrovos balansavimo įrenginio (Load Balancer) arba API vartų (API gateway). Šie elementai, padedantys valdyti duomenų srautą ir užtikrinti veiksmingą ryšį tarp paslaugų, yra labai svarbūs patikimai ir keičiamo dydžio mikroservisų architektūrai.
+Vertinant „Mono2Micro“ buvo pasitelkti trys vyresnieji Java programuotojai, kurie atliko esamos monolitinės programos ir įrankio pasiūlytos mikroservisų architektūros lyginamąją analizę. Jų išvados atskleidė keletą vertų dėmesio „Mono2Micro“ rekomendacijų trūkumų. Visų pirma jie pastebėjo, kad „Mono2Micro“ nesiūlė įtraukti įprastų komponentų, kurie paprastai yra susiję su mikroservisų architektūra, pavyzdžiui, apkrovos balansavimo įrenginio (Load Balancer) arba API vartų (API gateway). Šie elementai, padedantys valdyti duomenų srautą ir užtikrinti veiksmingą ryšį tarp paslaugų, yra labai svarbūs patikimai ir keičiamo dydžio mikroservisų architektūrai.
 
 Be to, programuotojai pažymėjo, kad „Mono2Micro“ rekomendavo iš monolito išskirti tik vieną „payment-api“ servisą. Tačiau jie nustatė, kad šią paslaugą būtų galima toliau skaidyti į „payment-api“ ir „mail-api“ mikroservisus. Šis pastebėjimas buvo pagrįstas prielaida, kad ateityje „mail-api“ funkcijos greičiausiai išsiplės, todėl bus reikalingas atskiras mikroservisas. Dėl to kyla klausimų dėl priemonės gebėjimo numatyti būsimą įvairių funkcinių sričių augimą ir jos gebėjimo pateikti optimaliai detalizuotas rekomendacijas dėl mikroservisų architektūros.
 
-Šios išvados rodo, kad nors „Mono2Micro“ gali pateikti vertingų rekomendacijų, kaip skaidyti monolitinę taikomąją programą, ji gali nevisiškai atspindėti visus mikroservisų architektūros niuansus. Tai pabrėžia, kad kartu su tokių priemonių naudojimu reikia žmogiškųjų žinių ir strateginio įžvalgumo, ir pabrėžia nuolatinio „Mono2Micro“ rekomendacijų algoritmų patvirtinimo ir tobulinimo svarbą.
+Šios išvados rodo, kad nors „Mono2Micro“ gali pateikti vertingų rekomendacijų, kaip skaidyti monolitinę programą, ji gali nevisiškai atspindėti visus mikroservisų architektūros niuansus. Tai pabrėžia, kad kartu su tokių priemonių naudojimu reikia žmogiškųjų žinių ir strateginio įžvalgumo, ir pabrėžia nuolatinio „Mono2Micro“ rekomendacijų algoritmų patvirtinimo ir tobulinimo svarbą.
 
 Kadangi įrankis parekomendavo 3 mikroservisus, o ekspertai įžvelgė 4, galima teigti, jog šiuo atveju mikroservisų rekomendacijų tikslumas yra lygus 75 \%. Reikia atsižvelgti, jog vienas šitas eksperimentas nepateikia tikrų „Mono2Micro“ sugebėjimų. Kad ši metrika būtų tikslesnė, privaloma atlikti daugiau tokių bandymų su didesniu skirtingų monolitų kiekiu.
 
@@ -285,6 +308,29 @@ Dokumentacijoje nėra aprašoma, kaip reikia elgtis tam tikrų klaidų atveju. J
 
 Vertinimas -- \textbf{3}.
 
+\subsection{Rezultatai}
+Eksperimentų metu pasiekti rezultatai yra pavaizduoti \ref{table:rezultatai} lentelėje. Remdamiesi „Mono2Micro“ vertinimo rezultatais, galime daryti išvadas, kad „Mono2Micro“ pasižymi dideliu našumu ir perspektyviu naudingumu migravimo procese. Rekomendacijų tikslumas siekia 75 \%, o tai rodo, kad nors priemonės pasiūlymai iš esmės atitinka ekspertų nuomonę, yra tokių atvejų, kai žmogiškosios žinios gali suteikti daugiau įžvalgų ar patobulinimų. Tai rodo, kad priemonė yra vertinga pagalba, nors ir nepakeičia ekspertų būtinumo. „Sėkmingo vykdymo rodiklis“ ir „Sėkmingo įgyvendinimo rodiklis“ siekia 100 \%, o tai rodo, kad įrankis geba generuoti rezultatus be klaidų ir kad jo rekomenduojamos mikroservisai sėkmingai veikia. Tai tvirtas „Mono2Micro“ veikimo patikimumo ir rekomendacijų veiksmingumo įrodymas. Apibendrinant galima teigti, jog šis įrankis sugeba kokybiškai atlikti monolitinės programos migravimą.
+
+Įrankio panaudojamumo požiūriu „Mono2Micro“ galima gerinti, ypač terminalo sąsają ir dokumentaciją, kurios abi įvertintos 3 balais iš 5. Šių sričių patobulinimai galėtų pagerinti naudotojo patirtį ir palengvinti su šia priemone susijusį mokymosi procesą. Interaktyvioji aplinka, įvertinta 4 balais iš 5, yra ypač gerai įvertinta, o tai rodo, kad ji yra veiksminga ir patogi naudoti. Atsižvelgiant į šiuos įvertinimus, akivaizdu, kad nors „Mono2Micro“ gerai atlieka savo funkcijas, į naudotojų atsiliepimus reikėtų atsižvelgti nuolat tobulinant jo vartotojo sąsają ir dokumentaciją.
+
+\begin{table}[!ht]
+    \centering
+    \caption{„Mono2Micro“ vertinimo rezultatai}
+    \label{table:rezultatai}
+    \begin{tabular}{|l|l|}
+    \hline
+        Mikroservisų rekomendacijų tikslumas & 75 \% \\ \hline
+        Sėkmingo vykdymo rodiklis & 100 \% \\ \hline
+        Įgyvendinimo sėkmės rodiklis & 100 \% \\ \hline
+        \textbf{Vidurkis} & \textbf{91 \%} \\ \hline
+        ~ & ~ \\ \hline
+        Terminalo vartotojo sąsaja & 3 / 5 \\ \hline
+        Interaktyvi aplinka & 4 / 5 \\ \hline
+        Dokumentacija & 3 / 5 \\ \hline
+        \textbf{Vidurkis} & \textbf{3.3 / 5} \\ \hline
+    \end{tabular}
+\end{table}
+
 \subsection{Patarimai ir rekomendacijos} % o gal \section{} ?
 Naudojantis „Mono2Micro“ viskas buvo remiamasi oficialia šio įrankio dokumentacija. Ji yra viešai prieinama ir aprašo visą procesą, nuo „Mono2Micro“ diegimo iki naujų mikroservisų diegimo IBM aplinkoje. Tačiau dokumentacijoje buvo aprašyti tik laimingo srauto (happy flow) scenarijai. Jei naudojimosi įrankiu metu atsiranda klaidos, tai jos dokumentacijoje nėra indikuojamos, o pats klaidų formatas yra labai neinformatyvus - tai įprastai yra tik Python kalbos klaidos pranešimai (stack trace). Susisiekti su IBM pagalbos linija taip pat yra itin sudėtinga. Kadangi tai yra tarptautinė įmonė, IBM normalizuoja savo pagalbos linijos procesą, kuris yra ilgai trunkantis ir dažnu atveju skiriamas tik įmonėms, o ne individualiems asmenims.
 
@@ -296,17 +342,42 @@ Darbo metu buvo nustatyti šie bendri pastebėjimai, kurie nėra paminėti dokum
 
     \item \textbf{Nėra galimybės redaguoti galutinio rekomendacijų grafo}. „Mono2Micro“ interaktyvi aplinka suteikia galimybę priskirti klases kitiems mikroservisams, tačiau nesuteikia galimybės ištrinti tam tikras klases iš šio grafo. Ši problema siejasi su antru punktu iš šio sąrašo. Jei galutiniame rekomendacijų grafe yra daug šiukšlinės informacijos, tai kenkia bendro vaizdo matymui vartotojui. Jei vartotojas nori panaikinti klases iš grafo, tai jis to negali atlikti interaktyvioje aplinkoje. Tai galima atlikti tik redaguojant grafo \verb|.json| failą. Tačiau kai yra daug klasių ir ryšių, klasių naikinimus reikia atlikti visoms klasėms. Kad šis darbas būtų atliktas, dar yra privaloma suprasti grafo failo struktūrą, kad rankomis redaguojamas grafas vėliau nebūtų sugadintas. Šio darbo autoriaus rekomendacija yra stengtis įtraukti kuo mažiau bibliotekų statinės analizės fazėje (\verb|mono2micro analyze|).
 
-    \item \textbf{Geras monolitinės programos padengimas integraciniais testais pagreitina migravimo laiką}. Dokumentacijoje nėra paminėta, tačiau panaudos atvejų fiksavimą (\verb|mono2micro usecase|) galima atlikti ne tik rankiniu būdu atliekant visus panaudos atvejui būdingus veiksmus, bet ir pasinaudojant egzistuojančiais testais, kurie padengia tą panaudos atvejį. Svarbiausia yra nepamiršti, jog nesvarbu ar panaudos atvejai yra fiksuojami rankiniu būdu, ar pasinaudojant testais, visų metodų įėjimo, išėjimo bei kvietimo informacija privalo būti rašoma į žurnalą pasinaudojant IBM suteiktu dvejetainio instrumentavimo įrankiu „Minerva“, kuris atlieka visų metodų fiksavimą ir užrašo kvietimus į žurnalą.
+    \item \textbf{Geras monolitinės programos padengimas integraciniais testais pagreitina migravimo laiką}. Dokumentacijoje nėra paminėta, tačiau panaudos atvejų fiksavimą (\verb|mono2micro usecase|) galima atlikti ne tik rankiniu būdu atliekant visus panaudos atvejui būdingus veiksmus, bet ir pasinaudojant egzistuojančiais testais, kurie padengia tą panaudos atvejį. Svarbiausia yra nepamiršti, jog nesvarbu ar panaudos atvejai yra fiksuojami rankiniu būdu, ar pasinaudojant testais, visų metodų įėjimo, išėjimo bei kvietimo informacija privalo būti rašoma į žurnalą pasinaudojant IBM suteiktu dvejetainio instrumentavimo agentu „Minerva“, kuris atlieka visų metodų fiksavimą ir užrašo kvietimus į žurnalą.
 
     \item \textbf{Įrankio sugeneruotas mikroservisų kodas nėra visur pritaikomas}. Dokumentacijoje yra minama, jog „Mono2Micro“ yra skirtas IBM Websphere Liberty serveriuose veikiančioms sistemoms, tačiau nepamini, jog sugeneruotas mikroservisų kodas naudoja IBM bibliotekas, kurių negalima atrasti bendroje Maven repozitorijoje.
 \end{itemize}
 
 
 \sectionnonum{Rezultatai}
-PLACEHOLDER Ka as padariau, ka ismokau, atlikau, sumodeliavau, isbandziau, supratau, etc
+Šio rašto darbo metu pasiekti rezultatai:
+\begin{itemize}
+    \item Išanalizuota monolitinė sistema „E Shop“: aprašyti esantys moduliai, panaudos atvejai, dydis, padengimo testais dydis, duomenų struktūra ir klasių ryšiai.
+
+    \item Aprašytas monolitinės programos migravimo procesas naudojantis „Mono2Micro“ įrankiu ir sėkmingai atlikta monolitinės programos migracija į mikroservisų architektūrą.
+
+    \item Buvo atlikti eksperimentai, kurie parodo „Mono2Micro“ kokybę ir naudą programų migravime.
+
+    \item Iš atliktų eksperimentų buvo nustatytos išvados, kurios įrodo „Mono2Micro“ veiksmingumą.
+
+    \item Surinktos ir aprašytos pastabos bei patarimai apie įrankio panaudojamumą būsimiems šio įrankio naudotojams.
+    
+\end{itemize}
 
 \sectionnonum{Išvados}
-PLACEHOLDER isvados apie tai kaip mono micro veikia, ar tinkamas irankis large scale programoms, ar verta ji naudoti, ar pats irankis kokybiskas, ar patikimas
+\begin{itemize}
+    \item „Mono2Micro“ veikia su Java kalba parašytomis programomis ir gali monolitinės programos analizę atlikti su Spring Boot karkasu.
+
+    \item „Mono2Micro“ pademonstravo aukštą patikimumo laipsnį. Įrankis sugeba sugeneruoti mikroservisų rekomendacijas ir tai atlikti be nenumatytų klaidų, tačiau yra privaloma atlikti daug paruošiamųjų darbų.
+
+    \item Nors „Mono2Micro“ pateikia dažnu atveju geras mikroservisų rekomendacijas, vis dar išlieka srities ekspertų reikalingumas, nes šis įrankis dar nesugeba atlikti tokių prognozių, kokias įžvelgia žmogus.
+
+    \item Parekomenduoti ir implementuoti mikroservisai atlieka savo pirmines užduotis ir nėra prarandami panaudos atvejai ar jų dalys. Nors šios užduotys yra atliekamos truputį lėčiau, tai yra įprasta mikroservisų architektūroje.
+
+    \item „Mono2Micro“ turi pakankamai aiškią vartotojo sąsają, tačiau nenumatytų klaidų atveju nepateikia grįžtamojo ryšio, kodėl nutiko klaida ar kaip jos išvengti.
+
+    \item Nors „Mono2Micro“ yra įrankis skirtas mikroservisų architektūros pagrindams suteikti, šis įrankis nepateikia rekomendacijų susijusių su įprastais mikroservisų architektūros aspektais, kaip krūvio skirstytojas, ar pačių duomenų migravimas.
+
+\end{itemize}
 
 
 \printbibliography[heading=bibintoc]
