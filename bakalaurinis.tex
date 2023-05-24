@@ -205,7 +205,8 @@ Programinės įrangos patikimumo vertinimas yra vienas būtiniausių matų, kuri
 
 \end{itemize}
 
-IBM „Mono2Micro“ kontekste tradiciniai patikimumo rodikliai, tokie kaip vidutinis laikas iki gedimo (MTTF) arba vidutinis laikas tarp gedimų (MTBF), nėra itin svarbūs ar taikytini. Pirmiausia todėl, kad „Mono2Micro“ nėra sistema, kuri nuolat veikia ir kuriai laikui bėgant gresia gedimo rizika, o būtent šiems rodikliams matuoti šie rodikliai ir yra skirti. Vietoj to, „Mono2Micro“ yra priemonė, kuri pateikia rekomendacijas kaip monolitinę „Java“ programą pertvarkyti į mikroservisus. Šiame kontekste „nesėkmės“ sąvoka yra kitokia ir ją tiksliau atspindi tokios metrikos kaip įrankio rekomendacijų tikslumas arba sėkmingo vykdymo be klaidų rodiklis. MTTF ir MTBF labiau tinka sistemoms, kuriose gedimai apibrėžiami kaip visiški sistemos gedimai, kuriuos reikia taisyti arba paleisti iš naujo, o tai netaikoma tokiai priemonei kaip „Mono2Micro“. Taigi, siekdami prasmingai įvertinti šios priemonės patikimumą, daugiausia dėmesio bus skirta rodikliams, labiau susijusiems su konkrečiomis šios priemonės funkcijomis ir tikėtiniems rezultatais.
+„Mono2Micro“ kontekste tradiciniai patikimumo rodikliai, tokie kaip vidutinis laikas iki gedimo (angl. \emph{MTTF, Mean Time To Failure}) arba vidutinis laikas tarp gedimų (angl. \emph{MTBF, Mean Time Between Failures}), nėra itin svarbūs ar taikytini. Pirmiausia todėl, kad „Mono2Micro“ nėra sistema, kuri nuolat veikia ir kuriai laikui bėgant gresia gedimo rizika, o būtent šiems rodikliams matuoti šie rodikliai ir yra skirti. Vietoj to, „Mono2Micro“ yra priemonė, kuri pateikia rekomendacijas kaip monolitinę „Java“ programą pertvarkyti į mikroservisus. Šiame kontekste „nesėkmės“ sąvoka yra kitokia ir ją tiksliau atspindi tokios metrikos kaip įrankio rekomendacijų tikslumas arba sėkmingo vykdymo be klaidų rodiklis. MTTF ir MTBF labiau tinka sistemoms, kuriose gedimai apibrėžiami kaip visiški sistemos gedimai, kuriuos reikia taisyti arba paleisti iš naujo, o tai netaikoma tokiai priemonei kaip „Mono2Micro“. Taigi, siekdami prasmingai įvertinti šios priemonės patikimumą, daugiausia dėmesio bus skirta rodikliams, labiau susijusiems su konkrečiomis šios priemonės funkcijomis ir tikėtiniems rezultatais.
+
 \subsubsection{Rezultatų pagrįstumas}
  % papasakoti daugiau apie rezultatų pagrįstumą?
 Rezultatų pagrįstumas programų sistemų inžinerijoje yra svarbus konceptas siekiant įrodyti, jog atlikti patikimumo eksperimentai tikrai įvertina programos kokybę, t.y. vertina tai, ką ir privalo vertinti \cite{LMPV}. „Mono2Micro“ kontekste, siekiant įvertinti rezultatų pagrįstumą, bus atsižvelgta į įgyvendinimo sėkmės rodiklį, t.y. rekomenduojamų mikroservisų, kurie, juos įdiegus, be sutrikimų atlieka numatytas funkcijas ir prisideda prie bendro sistemos funkcionalumo gerinimo, procentinę dalį. Ši metrika nurodys, ar naujai pertvarkyta programa vis dar teisingai atlieka savo užduotis ir ar įrankis migravimo metu nepanaikina kritinių programos dalių.
@@ -244,7 +245,6 @@ Kadangi \verb|mono2micro generate| komanda sugeneruoja kodą, kuris yra pritaiky
     \label{img:e-shop-komponentai}
 \end{figure}
 
-
 Šiame grafe galima pamatyti, jog „Mono2Micro“ išskyrė 3 mikroservisus (rekomenduotas 3 klasių „mikroservisas“ yra konfigūraciniai failai, kurie priklauso visoms klasėms):
 \begin{itemize}
     \item \verb|partition0| -- produktų mikroservisas
@@ -253,7 +253,6 @@ Kadangi \verb|mono2micro generate| komanda sugeneruoja kodą, kuris yra pritaiky
 
     \item \verb|partition2| -- pirkimų ir elektroninio pašto mikroservisas
 \end{itemize}
-
 
 Galima pastebėti, jog yra klasių, kurios nebuvo priskirtos jokiam mikroservisui. Tai yra klasės, kurios nebuvo kviečiamos ar kitaip naudojamos panaudos atvejų fiksavimo metu. Pasinaudojus šio grafo informacija, visi Java failai, priklausantys vienam mikroservisui, bus sukelti į naują mikroservisą. Jei failas yra naudojamas ir viename, ir kitame servise, vadinasi jis turi priklausyti abiem servisams. Kitaip sakant, jis bus dubliuojamas. Kiekvienas servisas turės savo duomenų bazę. Kvietimai tarp metodų bus pakeisti į REST protokolo kvietimus. Nauja architektūra, pagal „Mono2Micro“ rekomendaciją, pavaizduota \ref{img:nauja-architektura} pav. 
 
