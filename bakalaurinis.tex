@@ -203,21 +203,21 @@ Taikant šią griežtą tyrimo metodiką paaiškėjo, kad \enquote{Mono2Micro} y
 \hline
 \textbf{Kriterijus} & \textbf{Domenais grindžiamas projektavimas (DDD)} & \textbf{\enquote{Mono2Micro}} \\ 
 \hline
-Strategija & DDD suskaido sistemą į atskirus, laisvai susietus subdomenus arba ribotus kontekstus, kurių kiekvienas turi savo domeno modelį. &  Mono2Micro yra dirbtiniu intelektu paremtas įrankis, kuris analizuoja monolitinės programos statinę struktūrą ir dinaminę elgseną, kad pasiūlytų, kaip ją suskaidyti į mikroservisus. \\
+Strategija & DDD suskaido sistemą į atskirus, laisvai susietus subdomenus arba ribotus kontekstus, kurių kiekvienas turi savo domeno modelį \cite{New19}. &  Mono2Micro yra dirbtiniu intelektu paremtas įrankis, kuris analizuoja monolitinės programos statinę struktūrą ir dinaminę elgseną, kad pasiūlytų, kaip ją suskaidyti į mikroservisus \cite{KXK+21}. \\
 \hline
-Automatizavimas & DDD reikalauja kruopštaus ir apgalvoto planavimo ir analizės, todėl daug darbo tenka atlikti rankiniu būdu. Automatizuoti galima tik integracinius testus naudojantis CI/CD. & Mono2Micro automatizuoja analizės procesą, todėl sutaupoma daug laiko ir pastangų. \\
+Automatizavimas & DDD reikalauja kruopštaus ir apgalvoto planavimo ir analizės, todėl daug darbo tenka atlikti rankiniu būdu. Automatizuoti galima tik integracinius testus naudojantis CI/CD \cite{FBZ+19}. & Mono2Micro automatizuoja analizės procesą, todėl sutaupoma daug laiko ir pastangų \cite{KXK+21}. \\
 \hline
-Reikiama kompetencija & Reikia suprasti verslo sritį, išmanyti programinės įrangos architektūrą ir DDD principus. &  Reikalingos žinios apie migruojamą programą ir bazinis supratimas apie mikroservisų architektūrą. \\
+Reikiama kompetencija & Reikia suprasti verslo sritį, išmanyti programinės įrangos architektūrą ir DDD principus \cite{New19}. &  Reikalingos žinios apie migruojamą programą ir bazinis supratimas apie mikroservisų architektūrą \cite{IBMM2M}. \\
 \hline
-Tikslumas & Dekompozicijos tikslumas labai priklauso nuo komandos kompetencijos ir verslo srities supratimo. & Tikslumas priklauso nuo priemonės analizės algoritmų veiksmingumo, kurie bendru atveju veikia vienodai ir deterministiškai. \\
+Tikslumas & Dekompozicijos tikslumas labai priklauso nuo komandos kompetencijos ir verslo srities supratimo \cite{Wal22}. & Tikslumas priklauso nuo priemonės analizės algoritmų veiksmingumo, kurie bendru atveju veikia vienodai ir deterministiškai \cite{KXK+21, KXL+20}. \\
 \hline
-Lankstumas & DDD suteikia daug lankstumo ir leidžia kontroliuoti perėjimo procesą. & Lankstumą gali riboti priemonės sukurtos rekomendacijos, tačiau įrankio naudotojas gali pats pasirinkti, kokios klasės būtų kokiuose mikroservisuose. \\
+Lankstumas & DDD suteikia daug lankstumo ir leidžia kontroliuoti perėjimo procesą \cite{Beh18}. & Lankstumą gali riboti priemonės sukurtos rekomendacijos, tačiau įrankio naudotojas gali pats pasirinkti, kokios klasės būtų kokiuose mikroservisuose \cite{IBMM2M}. \\
 \hline
-Plečiamumas & Gautos mikroservisų architektūros mastelis labai priklauso nuo pradinio projekto ir dekompozicijos kokybės. & Mastelį lemia įrankio rekomendacijos ir pertvarkyto kodo kokybė. \\
+Plečiamumas & Gautos mikroservisų architektūros mastelis labai priklauso nuo pradinio projekto ir dekompozicijos kokybės \cite{New19}. & Mastelį lemia įrankio rekomendacijos ir pertvarkyto kodo kokybė \cite{KXL+20}. \\
 \hline
-Žinių perdavimas & Domenų srities žinios yra labai svarbios, o jų perdavimas dažnai vyksta netiesiogiai ir rankiniu būdu. & Įrankis aiškiai suteikia žinių apie taikomosios programos struktūrą ir elgseną, taip padėdamas palengvinti žinių perdavimą. \\
+Žinių perdavimas & Domenų srities žinios yra labai svarbios, o jų perdavimas dažnai vyksta netiesiogiai ir rankiniu būdu \cite{FBZ+19}. & Įrankis aiškiai suteikia žinių apie taikomosios programos struktūrą ir elgseną, taip padėdamas palengvinti žinių perdavimą \cite{IBMM2M}. \\
 \hline
-Laiko sąnaudos & Dėl rankinio darbo migravimo laikas ir sąnaudos yra santykinai dideli. & Įrankis gerokai sumažina skaidymo proceso laiką ir sąnaudas. \\
+Laiko sąnaudos & Dėl rankinio darbo migravimo laikas ir sąnaudos yra santykinai dideli \cite{New19, Beh18}. & Įrankis gerokai sumažina skaidymo proceso laiką ir sąnaudas \cite{KXK+21, KXL+20, IBMM2M}. \\
 \hline
 \end{tabularx}
 \caption{Domenais grindžiamo projektavimo ir „Mono2Micro“ migravimo strategijų palyginimas.}
